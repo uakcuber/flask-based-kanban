@@ -35,7 +35,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest pytest-cov flake8
     
     - name: Lint with flake8
       run: |
@@ -76,7 +75,7 @@ jobs:
     - name: Install security tools
       run: |
         python -m pip install --upgrade pip
-        pip install safety bandit
+        pip install safety bandit --no-deps
     
     - name: Check for security vulnerabilities in dependencies
       run: |
