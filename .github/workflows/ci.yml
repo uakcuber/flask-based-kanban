@@ -12,7 +12,7 @@ jobs:
     
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     
     steps:
     - name: Checkout code
@@ -70,7 +70,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: "3.10"
+        python-version: "3.12"
     
     - name: Install security tools
       run: |
@@ -102,4 +102,4 @@ jobs:
         echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Status:** ✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
-        echo "- **Python Versions Tested:** 3.8, 3.9, 3.10" >> $GITHUB_STEP_SUMMARY
+        echo "- **Python Versions Tested:** 3.10, 3.11, 3.12, 3.13" >> $GITHUB_STEP_SUMMARY
