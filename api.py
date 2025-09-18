@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, abort, Resource, reqparse, fields, marshal_with
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import pytest
 
 app = Flask(__name__)
 app.secret_key = 'benimgizlianahtarim123'  # Flash mesajları için - istediğin herhangi bir text
@@ -211,6 +212,19 @@ def success():
 @app.route("/unsuccess")
 def unsuccess():
     return render_template('unsuccess.html')
+
+
+
+@pytest.fixture
+def client():
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
+
+def test_users_api(client):
+    response = client.get('/api/users/')
+    assert response.status_code in [200, 404]  # Either success or no users found
+
 
 
 if __name__ == '__main__':
