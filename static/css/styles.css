@@ -3,10 +3,35 @@
 
 /*=============== VARIABLES CSS ===============*/
 :root {
-  /*========== Colors ==========*/
-  /*Color mode HSL(hue, saturation, lightness)*/
+  /*========== Light Theme Colors ==========*/
   --white-color: hsl(0, 0%, 100%);
   --black-color: hsl(0, 0%, 0%);
+  
+  /* Main background colors */
+  --bg-primary: hsl(0, 0%, 100%);
+  --bg-secondary: hsla(0, 0%, 100%, .01);
+  --bg-glass: hsla(0, 0%, 100%, .7);
+  --bg-glass-hover: hsla(0, 0%, 100%, .8);
+  
+  /* Text colors */
+  --text-primary: hsl(0, 0%, 100%);
+  --text-secondary: hsl(0, 0%, 100%);
+  --text-muted: hsl(0, 0%, 100%);
+  
+  /* Border colors */
+  --border-primary: hsla(0, 0%, 100%, .7);
+  --border-hover: hsla(0, 0%, 100%, .9);
+  --border-focus: #5087af;
+  
+  /* Blue theme colors (preserved) */
+  --blue-light: #5087af;
+  --blue-primary: hsl(207, 33%, 54%);
+  --blue-dark: hsl(207, 45%, 40%);
+  
+  /* Shadows */
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(80, 135, 175, 0.3);
+  --shadow-strong: rgba(80, 135, 175, 0.4);
 
   /*========== Font and typography ==========*/
   /*.5rem = 8px | 1rem = 16px ...*/
@@ -14,6 +39,35 @@
   --h1-font-size: 2rem;
   --normal-font-size: 1rem;
   --small-font-size: .813rem;
+}
+
+/*=============== DARK THEME ===============*/
+[data-theme="dark"] {
+  /*========== Dark Theme Colors ==========*/
+  --bg-primary: hsl(215, 28%, 17%);
+  --bg-secondary: hsla(215, 28%, 17%, .8);
+  --bg-glass: hsla(215, 28%, 25%, .8);
+  --bg-glass-hover: hsla(215, 28%, 30%, .9);
+  
+  /* Text colors for dark theme */
+  --text-primary: hsl(210, 40%, 95%);
+  --text-secondary: hsl(210, 25%, 85%);
+  --text-muted: hsl(210, 15%, 70%);
+  
+  /* Border colors for dark theme */
+  --border-primary: hsla(210, 25%, 40%, .6);
+  --border-hover: hsla(210, 25%, 50%, .8);
+  --border-focus: #64a6d1;
+  
+  /* Blue theme colors (adjusted for dark) */
+  --blue-light: #64a6d1;
+  --blue-primary: hsl(207, 45%, 65%);
+  --blue-dark: hsl(207, 50%, 75%);
+  
+  /* Dark theme shadows */
+  --shadow-light: rgba(0, 0, 0, 0.3);
+  --shadow-medium: rgba(100, 166, 209, 0.2);
+  --shadow-strong: rgba(100, 166, 209, 0.3);
 }
 
 /*=============== BASE ===============*/
@@ -59,10 +113,10 @@ img {
 .login__form {
   position: relative;
   margin-inline: 1.5rem;
-  background-color: hsla(0, 0%, 100%, .01);
-  border: 2px solid hsla(0, 0%, 100%, .7);
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
   padding: 2.5rem 1rem;
-  color: var(--white-color);
+  color: var(--text-primary);
   border-radius: 1rem;
   backdrop-filter: blur(16px);
   transition: all 0.5s ease;
@@ -81,9 +135,9 @@ img {
 }
 
 .login__form:hover {
-  border: 2px solid hsla(0, 0%, 100%, .8);
+  border: 2px solid var(--border-hover);
   backdrop-filter: blur(20px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px var(--shadow-light);
 }
 
 .login__title {
@@ -106,7 +160,7 @@ img {
   grid-template-columns: 1fr max-content;
   column-gap: .75rem;
   align-items: center;
-  border: 2px solid hsla(0, 0%, 100%, .7);
+  border: 2px solid var(--border-primary);
   padding-inline: 1.25rem;
   border-radius: 4rem;
   transition: all 0.4s ease;
@@ -114,9 +168,9 @@ img {
 }
 
 .login__box:hover {
-  border: 2px solid hsla(0, 0%, 100%, .9);
+  border: 2px solid var(--border-hover);
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 25px var(--shadow-light);
   backdrop-filter: blur(20px);
 }
 
@@ -129,7 +183,7 @@ img {
 .login__input {
   width: 100%;
   background: none;
-  color: var(--white-color);
+  color: var(--text-primary);
   padding-block: 1rem;
   transition: all 0.3s ease;
 }
@@ -139,13 +193,13 @@ img {
 }
 
 .login__box:focus-within {
-  border: 2px solid #5087af;
-  box-shadow: 0 0 20px rgba(80, 135, 175, 0.3);
+  border: 2px solid var(--border-focus);
+  box-shadow: 0 0 20px var(--shadow-medium);
   transform: translateY(-2px);
 }
 
 .login__input::placeholder {
-  color: var(--white-color);
+  color: var(--text-muted);
 }
 
 .login__box i {
@@ -234,15 +288,15 @@ img {
 }
 
 .login__button:hover {
-  background-color: #5087af;
-  color: var(--white-color);
+  background-color: var(--blue-light);
+  color: var(--text-primary);
   transform: translateY(-4px);
-  box-shadow: 0 12px 35px rgba(80, 135, 175, 0.4);
+  box-shadow: 0 12px 35px var(--shadow-strong);
 }
 
 .login__button:active {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(80, 135, 175, 0.3);
+  box-shadow: 0 8px 25px var(--shadow-medium);
 }
 
 .login__register {
@@ -336,6 +390,188 @@ img {
 .success-message.show {
   transform: translateX(0);
   opacity: 1;
+}
+
+/*=============== DARK MODE TOGGLE SWITCH ===============*/
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 64px;
+  height: 32px;
+  background: linear-gradient(145deg, #e0f2fe, #b3e5fc);
+  border-radius: 32px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 
+    inset 2px 2px 6px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.8),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  user-select: none;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 2px 2px 8px rgba(0, 0, 0, 0.12),
+    inset -2px -2px 8px rgba(255, 255, 255, 0.9),
+    0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle:active {
+  transform: translateY(0px);
+  box-shadow: 
+    inset 3px 3px 8px rgba(0, 0, 0, 0.15),
+    inset -1px -1px 4px rgba(255, 255, 255, 0.7),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle__slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(145deg, #ffffff, #f0f9ff);
+  border-radius: 50%;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 
+    2px 2px 6px rgba(0, 0, 0, 0.15),
+    -1px -1px 4px rgba(255, 255, 255, 0.9),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.8),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.theme-toggle__slider::before {
+  content: '☀️';
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Dark mode styles for toggle */
+[data-theme="dark"] .theme-toggle {
+  background: linear-gradient(145deg, #1e293b, #334155);
+  box-shadow: 
+    inset 2px 2px 6px rgba(0, 0, 0, 0.3),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.05),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+  box-shadow: 
+    inset 2px 2px 8px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 8px rgba(255, 255, 255, 0.08),
+    0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .theme-toggle__slider {
+  left: 35px;
+  background: linear-gradient(145deg, #475569, #64748b);
+  box-shadow: 
+    2px 2px 6px rgba(0, 0, 0, 0.4),
+    -1px -1px 4px rgba(255, 255, 255, 0.08),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.1),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .theme-toggle__slider::before {
+  content: '🌙';
+}
+
+/* Toggle container for proper positioning */
+.theme-toggle-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-container:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .theme-toggle-container {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .theme-toggle-container:hover {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/*=============== DARK THEME BODY BACKGROUND ===============*/
+body {
+  background: var(--bg-primary);
+  transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] body {
+  background: linear-gradient(135deg, 
+    hsl(215, 28%, 15%) 0%, 
+    hsl(215, 25%, 18%) 25%, 
+    hsl(215, 22%, 16%) 50%, 
+    hsl(215, 28%, 14%) 100%);
+}
+
+/* Dark theme specific login background */
+[data-theme="dark"] .login {
+  background: linear-gradient(135deg, 
+    hsl(215, 28%, 12%) 0%, 
+    hsl(215, 25%, 15%) 25%, 
+    hsl(215, 22%, 14%) 50%, 
+    hsl(215, 28%, 11%) 100%);
+}
+
+/*=============== DARK THEME CHECKBOX STYLES ===============*/
+[data-theme="dark"] .login__check-input {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background-color: transparent;
+}
+
+[data-theme="dark"] .login__check-input:checked {
+  background-color: var(--blue-light);
+  border-color: var(--blue-light);
+}
+
+[data-theme="dark"] .login__check-input:checked::after {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .login__check-input:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 10px var(--shadow-medium);
+}
+
+/*=============== DARK THEME LINKS ===============*/
+[data-theme="dark"] .login__forgot,
+[data-theme="dark"] .login__register a {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .login__forgot:hover,
+[data-theme="dark"] .login__register a:hover {
+  color: var(--blue-light);
+}
+
+/*=============== SMOOTH THEME TRANSITION ===============*/
+* {
+  transition: background-color 0.3s ease, 
+              border-color 0.3s ease, 
+              color 0.3s ease, 
+              box-shadow 0.3s ease;
 }
 
 /*=============== BREAKPOINTS ===============*/

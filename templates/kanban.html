@@ -19,6 +19,7 @@
     
     <script>
         tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
             theme: {
                 extend: {
                     colors: {
@@ -33,6 +34,18 @@
                             700: '#0369a1',
                             800: '#075985',
                             900: '#0c4a6e'
+                        },
+                        'dark-ice': {
+                            50: '#1e293b',
+                            100: '#334155',
+                            200: '#475569',
+                            300: '#64748b',
+                            400: '#94a3b8',
+                            500: '#cbd5e1',
+                            600: '#e2e8f0',
+                            700: '#f1f5f9',
+                            800: '#f8fafc',
+                            900: '#ffffff'
                         }
                     },
                     animation: {
@@ -176,6 +189,11 @@
             border-radius: inherit;
         }
 
+        /* Dark mode task card pseudo-element */
+        [data-theme="dark"] .task-card::before {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 35%, #1d4ed8 70%, #1e40af 100%);
+        }
+
         /* Task card hover effects */
         .task-card:hover {
             transform: translateY(-2px);
@@ -186,6 +204,15 @@
                 0 15px 15px -5px rgba(59, 130, 246, 0.3),
                 0 10px 10px -5px rgba(37, 99, 235, 0.2),
                 0 5px 5px -2px rgba(29, 78, 216, 0.1);
+        }
+
+        /* Dark mode task card hover effects */
+        [data-theme="dark"] .task-card:hover {
+            box-shadow: 
+                0 20px 25px -5px rgba(59, 130, 246, 0.3), 
+                0 15px 15px -5px rgba(37, 99, 235, 0.25),
+                0 10px 10px -5px rgba(29, 78, 216, 0.15),
+                0 5px 5px -2px rgba(30, 64, 175, 0.08);
         }
 
         .task-card:hover::before {
@@ -240,6 +267,19 @@
             box-shadow: 
                 0 8px 32px rgba(125, 211, 252, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        /* Dark mode list container fix */
+        [data-theme="dark"] .list-container {
+            background: rgba(51, 65, 85, 0.4);
+            border: 1px solid rgba(100, 116, 139, 0.4);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(148, 163, 184, 0.2);
+            overflow: hidden;
         }
 
         /* Enhanced Glass morphism background */
@@ -257,6 +297,16 @@
                 linear-gradient(135deg, rgba(240, 249, 255, 0.8) 0%, rgba(224, 242, 254, 0.6) 100%);
             pointer-events: none;
             z-index: -1;
+            transition: all 0.5s ease;
+        }
+
+        /* Dark mode background */
+        [data-theme="dark"] body::before {
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(30, 58, 138, 0.3) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 40% 60%, rgba(37, 99, 235, 0.15) 0%, transparent 45%),
+                linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
         }
 
         /* Enhanced glass effect for containers */
@@ -268,6 +318,16 @@
             box-shadow: 
                 0 8px 32px rgba(125, 211, 252, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        /* Dark mode glass containers */
+        [data-theme="dark"] .glass-container {
+            background: rgba(51, 65, 85, 0.4);
+            border: 1px solid rgba(100, 116, 139, 0.4);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(148, 163, 184, 0.3);
         }
 
         /* Glass effect for cards */
@@ -279,6 +339,16 @@
             box-shadow: 
                 0 4px 16px rgba(125, 211, 252, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        /* Dark mode glass cards */
+        [data-theme="dark"] .glass-card {
+            background: rgba(71, 85, 105, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(203, 213, 225, 0.2);
         }
 
         /* Shimmer loading effect */
@@ -287,12 +357,132 @@
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
         }
+
+        /*=============== DARK MODE TOGGLE SWITCH ===============*/
+        .theme-toggle {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            width: 64px;
+            height: 32px;
+            background: linear-gradient(145deg, #e0f2fe, #b3e5fc);
+            border-radius: 32px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 
+                inset 2px 2px 6px rgba(0, 0, 0, 0.1),
+                inset -2px -2px 6px rgba(255, 255, 255, 0.8),
+                0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            user-select: none;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                inset 2px 2px 8px rgba(0, 0, 0, 0.12),
+                inset -2px -2px 8px rgba(255, 255, 255, 0.9),
+                0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-toggle:active {
+            transform: translateY(0px);
+            box-shadow: 
+                inset 3px 3px 8px rgba(0, 0, 0, 0.15),
+                inset -1px -1px 4px rgba(255, 255, 255, 0.7),
+                0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle__slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 26px;
+            height: 26px;
+            background: linear-gradient(145deg, #ffffff, #f0f9ff);
+            border-radius: 50%;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 
+                2px 2px 6px rgba(0, 0, 0, 0.15),
+                -1px -1px 4px rgba(255, 255, 255, 0.9),
+                inset 1px 1px 2px rgba(255, 255, 255, 0.8),
+                inset -1px -1px 2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .theme-toggle__slider::before {
+            content: '☀️';
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Dark mode styles for toggle */
+        [data-theme="dark"] .theme-toggle {
+            background: linear-gradient(145deg, #1e293b, #334155);
+            box-shadow: 
+                inset 2px 2px 6px rgba(0, 0, 0, 0.3),
+                inset -2px -2px 6px rgba(255, 255, 255, 0.05),
+                0 4px 12px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] .theme-toggle:hover {
+            box-shadow: 
+                inset 2px 2px 8px rgba(0, 0, 0, 0.4),
+                inset -2px -2px 8px rgba(255, 255, 255, 0.08),
+                0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        [data-theme="dark"] .theme-toggle__slider {
+            left: 35px;
+            background: linear-gradient(145deg, #475569, #64748b);
+            box-shadow: 
+                2px 2px 6px rgba(0, 0, 0, 0.4),
+                -1px -1px 4px rgba(255, 255, 255, 0.08),
+                inset 1px 1px 2px rgba(255, 255, 255, 0.1),
+                inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] .theme-toggle__slider::before {
+            content: '🌙';
+        }
+
+        /* Toggle container for proper positioning */
+        .theme-toggle-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-container:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        [data-theme="dark"] .theme-toggle-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] .theme-toggle-container:hover {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
     </style>
 </head>
-<body class="h-full bg-gradient-to-br from-ice-50 via-blue-50 to-ice-100 overflow-hidden">
+<body class="h-full bg-gradient-to-br from-ice-50 via-blue-50 to-ice-100 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900 overflow-hidden transition-colors duration-500">
     
     <!-- Header with Glass Effect -->
-    <header class="backdrop-blur-xl bg-white/20 border-b border-white/30 shadow-lg sticky top-0 z-50">
+    <header class="backdrop-blur-xl bg-white/20 dark:bg-slate-800/60 border-b border-white/30 dark:border-slate-600/50 shadow-lg sticky top-0 z-50 transition-colors duration-300">
         <div class="px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
@@ -300,26 +490,35 @@
                         <i class="ri-dashboard-3-line text-white text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold bg-gradient-to-r from-ice-700 to-blue-800 bg-clip-text text-transparent">
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-ice-700 to-blue-800 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
                             Kanban Board
                         </h1>
                         {% if user %}
-                        <p class="text-sm text-ice-600 font-medium">Welcome back, {{ user.name }}! 👋</p>
+                        <p class="text-sm text-ice-600 dark:text-slate-300 font-medium">Welcome back, {{ user.name }}! 👋</p>
                         {% endif %}
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-3">
+                    <!-- Dark Mode Toggle -->
+                    <div class="theme-toggle-container">
+                        <button onclick="toggleTheme()" 
+                                class="theme-toggle"
+                                title="Toggle Dark/Light Mode">
+                            <div class="theme-toggle__slider"></div>
+                        </button>
+                    </div>
+                    
                     <!-- Scroll Info Button -->
                     <button onclick="toggleScrollInfo()" 
-                            class="inline-flex items-center px-3 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 
-                                   text-ice-600 rounded-lg hover:bg-white/20 transition-all duration-200 group"
+                            class="inline-flex items-center px-3 py-2.5 bg-white/10 dark:bg-slate-700/50 backdrop-blur-sm border border-white/20 dark:border-slate-600/50 
+                                   text-ice-600 dark:text-slate-300 rounded-lg hover:bg-white/20 dark:hover:bg-slate-600/50 transition-all duration-200 group"
                             title="Scroll Controls">
                         <i class="ri-mouse-line group-hover:animate-bounce"></i>
                     </button>
                     
                     <button onclick="openAddListModal()" 
-                            class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-ice-500 to-blue-600 
+                            class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-ice-500 to-blue-600 dark:from-blue-600 dark:to-cyan-600
                                    text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 
                                    transition-all duration-200 backdrop-blur-sm group">
                         <i class="ri-add-line mr-2 group-hover:rotate-90 transition-transform duration-200"></i>
@@ -327,8 +526,8 @@
                     </button>
                     
                     <button onclick="logout()" 
-                            class="inline-flex items-center px-4 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 
-                                   text-ice-700 font-semibold rounded-lg hover:bg-white/30 transition-all duration-200">
+                            class="inline-flex items-center px-4 py-2.5 bg-white/20 dark:bg-slate-700/50 backdrop-blur-sm border border-white/30 dark:border-slate-600/50 
+                                   text-ice-700 dark:text-slate-200 font-semibold rounded-lg hover:bg-white/30 dark:hover:bg-slate-600/60 transition-all duration-200">
                         <i class="ri-logout-box-line mr-2"></i>
                         Logout
                     </button>
@@ -339,12 +538,12 @@
 
     <!-- Success Alert -->
     <div id="successAlert" class="fixed top-20 right-6 z-50 hidden animate-slide-in">
-        <div class="p-4 text-sm text-green-800 rounded-lg bg-green-50 border border-green-200 shadow-lg backdrop-blur-sm" role="alert">
+        <div class="p-4 text-sm text-green-800 dark:text-green-200 rounded-lg bg-green-50 dark:bg-green-800/20 border border-green-200 dark:border-green-600/50 shadow-lg backdrop-blur-sm" role="alert">
             <div class="flex items-center">
                 <i class="ri-check-line text-lg mr-2"></i>
                 <span class="font-medium">Success!</span>
                 <span id="successMessage" class="ml-2">Operation completed successfully.</span>
-                <button onclick="hideAlert('successAlert')" class="ml-auto text-green-600 hover:text-green-800">
+                <button onclick="hideAlert('successAlert')" class="ml-auto text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
                     <i class="ri-close-line"></i>
                 </button>
             </div>
@@ -353,12 +552,12 @@
 
     <!-- Error Alert -->
     <div id="errorAlert" class="fixed top-20 right-6 z-50 hidden animate-slide-in">
-        <div class="p-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200 shadow-lg backdrop-blur-sm" role="alert">
+        <div class="p-4 text-sm text-red-800 dark:text-red-200 rounded-lg bg-red-50 dark:bg-red-800/20 border border-red-200 dark:border-red-600/50 shadow-lg backdrop-blur-sm" role="alert">
             <div class="flex items-center">
                 <i class="ri-error-warning-line text-lg mr-2"></i>
                 <span class="font-medium">Error!</span>
                 <span id="errorMessage" class="ml-2">Something went wrong.</span>
-                <button onclick="hideAlert('errorAlert')" class="ml-auto text-red-600 hover:text-red-800">
+                <button onclick="hideAlert('errorAlert')" class="ml-auto text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
                     <i class="ri-close-line"></i>
                 </button>
             </div>
@@ -367,7 +566,7 @@
 
     <!-- Scroll Info Tooltip -->
     <div id="scrollInfo" class="fixed top-20 left-6 z-50 hidden animate-slide-in">
-        <div class="p-4 text-sm text-blue-800 rounded-lg bg-blue-50/90 border border-blue-200 shadow-lg backdrop-blur-sm glass-card" role="alert">
+        <div class="p-4 text-sm text-blue-800 dark:text-blue-200 rounded-lg bg-blue-50/90 dark:bg-blue-800/20 border border-blue-200 dark:border-blue-600/50 shadow-lg backdrop-blur-sm glass-card" role="alert">
             <div class="space-y-2">
                 <div class="flex items-center mb-2">
                     <i class="ri-mouse-line text-lg mr-2"></i>
@@ -544,8 +743,36 @@
         let currentTaskListId = null;
         let sortableInstances = [];
 
+        // Theme Management
+        function initializeTheme() {
+            // Get saved theme from localStorage or default to light
+            const savedTheme = localStorage.getItem('kanban-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            console.log('🎨 Theme initialized:', savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('kanban-theme', newTheme);
+            
+            console.log('🎨 Theme switched to:', newTheme);
+            
+            // Add a smooth transition effect
+            document.body.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            setTimeout(() => {
+                document.body.style.transition = '';
+            }, 400);
+        }
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme first
+            initializeTheme();
+            
             // Test if SortableJS loaded
             console.log('🔍 SortableJS loaded:', typeof Sortable !== 'undefined');
             console.log('🔍 Sortable object:', Sortable);
@@ -691,37 +918,37 @@
         // Create list element
         function createListElement(list) {
             const listDiv = document.createElement('div');
-            listDiv.className = 'kanban-list flex-shrink-0 w-80 h-fit animate-slide-in';
+            listDiv.className = 'kanban-list list-container flex-shrink-0 w-80 h-fit animate-slide-in';
             listDiv.dataset.listId = list.id;
             
             const tasks = (list.tasks || []).sort((a, b) => (a.position || 0) - (b.position || 0));
             const isProtected = PROTECTED_LISTS.includes(list.title);
             
             listDiv.innerHTML = `
-                <div class="bg-white/30 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 h-full max-h-[calc(100vh-180px)]" style="overflow: visible;">
+                <div class="h-full max-h-[calc(100vh-180px)] transition-colors duration-300" style="overflow: visible; background: transparent; border: none;">
                     <!-- List Header -->
-                    <div class="bg-gradient-to-r from-ice-100/80 to-blue-100/80 p-4 border-b border-white/30">
+                    <div class="bg-gradient-to-r from-ice-100/80 to-blue-100/80 dark:from-slate-700/60 dark:to-blue-800/40 p-4 border-b border-white/30 dark:border-slate-600/50 transition-colors duration-300 rounded-t-2xl">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-3">
                                 <div class="w-3 h-3 rounded-full bg-gradient-to-r from-ice-400 to-blue-500 animate-bounce-soft"></div>
-                                <h3 class="text-lg font-bold text-ice-800">${list.title}</h3>
-                                <span class="text-xs font-semibold text-ice-600 bg-ice-200/60 px-2 py-1 rounded-full">
+                                <h3 class="text-lg font-bold text-ice-800 dark:text-slate-100">${list.title}</h3>
+                                <span class="text-xs font-semibold text-ice-600 dark:text-slate-300 bg-ice-200/60 dark:bg-slate-600/60 px-2 py-1 rounded-full">
                                     ${tasks.length}
                                 </span>
                                 ${isProtected ? `
-                                    <span class="text-xs text-ice-500 bg-ice-100/50 px-2 py-1 rounded-full border border-ice-200" title="Protected list - cannot be deleted">
+                                    <span class="text-xs text-ice-500 dark:text-slate-400 bg-ice-100/50 dark:bg-slate-700/50 px-2 py-1 rounded-full border border-ice-200 dark:border-slate-600" title="Protected list - cannot be deleted">
                                         <i class="ri-shield-check-line"></i>
                                     </span>
                                 ` : ''}
                             </div>
                             <div class="flex items-center space-x-1">
                                 <button onclick="openAddTaskModal(${list.id})" 
-                                        class="text-ice-600 hover:text-ice-800 hover:bg-white/50 p-2 rounded-lg transition-all duration-200 transform hover:scale-110 group">
+                                        class="text-ice-600 dark:text-slate-300 hover:text-ice-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-600/50 p-2 rounded-lg transition-all duration-200 transform hover:scale-110 group">
                                     <i class="ri-add-line text-xl group-hover:rotate-90 transition-transform duration-200"></i>
                                 </button>
                                 ${!isProtected ? `
                                     <button onclick="deleteList(${list.id}, '${list.title}')" 
-                                            class="text-gray-400 hover:text-red-500 hover:bg-red-50/50 p-2 rounded-lg transition-all duration-200 transform hover:scale-110 group">
+                                            class="text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-800/20 p-2 rounded-lg transition-all duration-200 transform hover:scale-110 group">
                                         <i class="ri-delete-bin-line text-lg group-hover:animate-pulse"></i>
                                     </button>
                                 ` : ''}
@@ -730,7 +957,7 @@
                     </div>
                     
                     <!-- Tasks Container -->
-                    <div class="scrollable-area p-4 overflow-y-auto max-h-[calc(100vh-300px)] scrollbar-thin scrollbar-thumb-ice-300">
+                    <div class="scrollable-area p-4 overflow-y-auto max-h-[calc(100vh-300px)] scrollbar-thin scrollbar-thumb-ice-300 rounded-b-2xl">
                         <div class="tasks-container space-y-3 min-h-[50px]" data-list-id="${list.id}">
                             ${tasks.map(task => createTaskElement(task)).join('')}
                         </div>
@@ -738,7 +965,7 @@
                         <!-- Quick Add Task -->
                         <div class="mt-4 pt-3 border-t border-white/20">
                             <button onclick="openAddTaskModal(${list.id})" 
-                                    class="w-full text-left text-ice-600 hover:text-ice-800 hover:bg-white/30 p-3 rounded-xl border-2 border-dashed border-ice-300 hover:border-ice-400 transition-all duration-200 group">
+                                    class="w-full text-left text-ice-600 dark:text-slate-300 hover:text-ice-800 dark:hover:text-slate-100 hover:bg-white/30 dark:hover:bg-slate-600/30 p-3 rounded-xl border-2 border-dashed border-ice-300 dark:border-slate-500 hover:border-ice-400 dark:hover:border-slate-400 transition-all duration-200 group">
                                 <i class="ri-add-line mr-2 group-hover:rotate-90 transition-transform duration-200"></i>
                                 Add new task...
                             </button>
@@ -820,22 +1047,22 @@
             const priority = priorityConfig[task.priority] || priorityConfig.medium;
             
             return `
-                <div class="task-card bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/40 cursor-move group ${priority.bg}/30 relative z-10" 
+                <div class="task-card bg-blue-50/90 dark:bg-blue-900/20 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-blue-200/60 dark:border-blue-700/40 cursor-move group transition-colors duration-300 relative z-10" 
                      data-task-id="${task.id}">
                     
                     <div class="flex items-start justify-between mb-3">
-                        <h4 class="text-sm font-bold text-gray-800 line-clamp-2 flex-1 mr-2">
+                        <h4 class="text-sm font-bold text-blue-900 dark:text-blue-100 line-clamp-2 flex-1 mr-2">
                             ${task.title}
                         </h4>
                         <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <button class="text-gray-400 hover:text-red-500 p-1 rounded transition-colors" onclick="deleteTask(${task.id})">
+                            <button class="text-blue-400 dark:text-blue-500 hover:text-red-500 dark:hover:text-red-400 p-1 rounded transition-colors" onclick="deleteTask(${task.id})">
                                 <i class="ri-delete-bin-line text-sm"></i>
                             </button>
                         </div>
                     </div>
                     
                     ${task.description ? `
-                        <p class="text-xs text-gray-600 mb-3 line-clamp-2 bg-gray-50/50 p-2 rounded-lg">
+                        <p class="text-xs text-blue-700 dark:text-blue-300 mb-3 line-clamp-2 bg-blue-100/60 dark:bg-blue-800/30 p-2 rounded-lg">
                             ${task.description}
                         </p>
                     ` : ''}
@@ -846,7 +1073,7 @@
                             ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                         </span>
                         
-                        <div class="flex items-center space-x-2 text-xs text-gray-500">
+                        <div class="flex items-center space-x-2 text-xs text-blue-600 dark:text-blue-400">
                             <i class="ri-time-line"></i>
                             <span>${new Date(task.created_at || Date.now()).toLocaleDateString()}</span>
                         </div>
@@ -854,7 +1081,7 @@
                     
                     <!-- Drag Handle -->
                     <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <i class="ri-drag-move-2-line text-gray-400 text-sm"></i>
+                        <i class="ri-drag-move-2-line text-blue-400 dark:text-blue-500 text-sm"></i>
                     </div>
                 </div>
             `;
@@ -1116,6 +1343,24 @@
                 alert.classList.remove('opacity-0');
             }, 300);
         }
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Initialize theme on page load
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+
+        // Initialize theme when page loads
+        document.addEventListener('DOMContentLoaded', initializeTheme);
 
         // Scroll info functions
         function toggleScrollInfo() {

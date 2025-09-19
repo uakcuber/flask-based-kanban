@@ -13,6 +13,17 @@
       <title>Register form - Bedimcode</title>
    </head>
    <body>
+      <!-- Dark Mode Toggle - Fixed Position -->
+      <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+         <div class="theme-toggle-container">
+            <button onclick="toggleTheme()" 
+                    class="theme-toggle"
+                    title="Toggle Dark/Light Mode">
+               <div class="theme-toggle__slider"></div>
+            </button>
+         </div>
+      </div>
+
       <div class="login">
          <img src="{{ url_for('static', filename='img/login-bg.png') }}" alt="image" class="login__bg">
 
@@ -59,6 +70,29 @@
       {% endwith %}
 
       <script>
+         // Theme Management
+         function initializeTheme() {
+            const savedTheme = localStorage.getItem('kanban-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+         }
+
+         function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('kanban-theme', newTheme);
+            
+            // Add smooth transition
+            document.body.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            setTimeout(() => {
+               document.body.style.transition = '';
+            }, 400);
+         }
+
+         // Initialize theme on page load
+         initializeTheme();
+
          // Custom validation functions
          function showError(element, message) {
             // Remove existing error
