@@ -99,11 +99,14 @@
         /* Ensure task containers handle scroll properly */
         .scrollable-area {
             scroll-behavior: smooth;
+            position: relative;
         }
         
-        /* Prevent horizontal scroll on task containers */
+        /* Task containers should allow drag overflow */
         .tasks-container {
-            overflow-x: hidden;
+            overflow: visible !important;
+            position: relative;
+            min-height: 50px;
         }
 
         /* Line clamp utility */
@@ -118,6 +121,18 @@
         .sortable-ghost {
             opacity: 0.6;
             transform: rotate(5deg);
+            background: rgba(59, 130, 246, 0.2) !important;
+            border: 2px dashed #3b82f6 !important;
+        }
+        
+        .sortable-chosen {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5) !important;
+        }
+        
+        .sortable-drag {
+            transform: rotate(5deg) scale(1.05) !important;
+            z-index: 1000 !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
         }
 
         /* Task card smooth transitions */
@@ -125,6 +140,16 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        /* Enable pointer events for drag */
+        .sortable-drag {
+            pointer-events: auto !important;
+            cursor: grabbing !important;
         }
 
         /* Task card pseudo-element for smooth background transition */
@@ -511,6 +536,10 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Test if SortableJS loaded
+            console.log('🔍 SortableJS loaded:', typeof Sortable !== 'undefined');
+            console.log('🔍 Sortable object:', Sortable);
+            
             loadBoards();
         });
 
@@ -659,7 +688,7 @@
             const isProtected = PROTECTED_LISTS.includes(list.title);
             
             listDiv.innerHTML = `
-                <div class="bg-white/30 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 overflow-hidden h-full max-h-[calc(100vh-180px)]">
+                <div class="bg-white/30 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 h-full max-h-[calc(100vh-180px)]" style="overflow: visible;">
                     <!-- List Header -->
                     <div class="bg-gradient-to-r from-ice-100/80 to-blue-100/80 p-4 border-b border-white/30">
                         <div class="flex items-center justify-between">
@@ -713,22 +742,50 @@
                 const tasksContainer = listDiv.querySelector('.tasks-container');
                 const scrollableArea = listDiv.querySelector('.scrollable-area');
                 
+                console.log('🔍 Creating sortable for list:', list.title);
+                console.log('🔍 Tasks container:', tasksContainer);
+                console.log('🔍 Tasks in container:', tasksContainer.children.length);
+                
                 // Add scroll event handling for task containers
                 scrollableArea.addEventListener('wheel', function(e) {
                     // Allow normal vertical scrolling within the task container
                     e.stopPropagation();
                 });
                 
-                const sortable = Sortable.create(tasksContainer, {
-                    group: 'tasks',
-                    animation: 200,
-                    ghostClass: 'sortable-ghost',
-                    dragClass: 'transform rotate-2 scale-105',
-                    onEnd: function(evt) {
-                        handleTaskMove(evt.item, evt.from, evt.to, evt.newIndex);
-                    }
-                });
-                sortableInstances.push(sortable);
+                if (tasksContainer && typeof Sortable !== 'undefined') {
+                    const sortable = Sortable.create(tasksContainer, {
+                        group: 'tasks',
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        dragClass: 'sortable-drag',
+                        forceFallback: false,
+                        fallbackTolerance: 3,
+                        swapThreshold: 0.65,
+                        onStart: function(evt) {
+                            console.log('🎯 Drag started:', evt.item);
+                            // Remove any transform that might interfere
+                            evt.item.style.position = 'relative';
+                            evt.item.style.zIndex = '1000';
+                            document.body.style.cursor = 'grabbing';
+                        },
+                        onMove: function(evt) {
+                            console.log('🎯 Drag moving:', evt.dragged);
+                            return true; // Allow the move
+                        },
+                        onEnd: function(evt) {
+                            console.log('🎯 Drag ended:', evt.item, 'from', evt.from, 'to', evt.to);
+                            evt.item.style.position = '';
+                            evt.item.style.zIndex = '';
+                            document.body.style.cursor = '';
+                            handleTaskMove(evt.item, evt.from, evt.to, evt.newIndex);
+                        }
+                    });
+                    sortableInstances.push(sortable);
+                    console.log('✅ Sortable created successfully for:', list.title);
+                } else {
+                    console.error('❌ Cannot create sortable - missing container or Sortable library');
+                }
             }, 100);
 
             return listDiv;
@@ -745,8 +802,8 @@
             const priority = priorityConfig[task.priority] || priorityConfig.medium;
             
             return `
-                <div class="task-card bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/40 cursor-grab active:cursor-grabbing group ${priority.bg}/30 relative z-10" 
-                     data-task-id="${task.id}" draggable="true">
+                <div class="task-card bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/40 cursor-move group ${priority.bg}/30 relative z-10" 
+                     data-task-id="${task.id}">
                     
                     <div class="flex items-start justify-between mb-3">
                         <h4 class="text-sm font-bold text-gray-800 line-clamp-2 flex-1 mr-2">

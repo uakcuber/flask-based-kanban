@@ -180,12 +180,21 @@ list_args.add_argument("title", type=str, help="Title cannot be blank", required
 list_args.add_argument("position", type=int, required=False, default=0)
 list_args.add_argument("board_id", type=int, help="Board ID required", required=True)
 
-task_args = reqparse.RequestParser()
-task_args.add_argument("title", type=str, help="Title cannot be blank", required=True)
-task_args.add_argument("description", type=str, required=False)
-task_args.add_argument("position", type=int, required=False, default=0)
-task_args.add_argument("priority", type=str, required=False, default='medium')
-task_args.add_argument("list_id", type=int, help="List ID required", required=True)
+# Task args for POST (create)
+task_create_args = reqparse.RequestParser()
+task_create_args.add_argument("title", type=str, help="Title cannot be blank", required=True)
+task_create_args.add_argument("description", type=str, required=False)
+task_create_args.add_argument("position", type=int, required=False, default=0)
+task_create_args.add_argument("priority", type=str, required=False, default='medium')
+task_create_args.add_argument("list_id", type=int, help="List ID required", required=True)
+
+# Task args for PATCH (update) - all optional
+task_update_args = reqparse.RequestParser()
+task_update_args.add_argument("title", type=str, required=False)
+task_update_args.add_argument("description", type=str, required=False)
+task_update_args.add_argument("position", type=int, required=False)
+task_update_args.add_argument("priority", type=str, required=False)
+task_update_args.add_argument("list_id", type=int, required=False)
 
 userfields = {
     "id": fields.Integer,
@@ -458,7 +467,7 @@ class Tasks(Resource):
     @marshal_with(taskfields)
     def post(self):
         """Create new task (only in user's own lists)"""
-        args = task_args.parse_args()
+        args = task_create_args.parse_args()
         
         # Check if list exists and belongs to current user's board
         list_item = ListModel.query.join(BoardModel).filter(
@@ -498,7 +507,7 @@ class Task(Resource):
         if not task:
             abort(404, message="Task not found or access denied")
             
-        args = task_args.parse_args()
+        args = task_update_args.parse_args()
         if args.get("title"):
             task.title = args["title"]
         if args.get("description") is not None:
