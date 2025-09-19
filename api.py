@@ -435,13 +435,18 @@ class List(Resource):
     
     @api_auth_required
     def delete(self, id):
-        """Delete list (only if in user's own board)"""
+        """Delete list (only if in user's own board and not protected)"""
         list_item = ListModel.query.join(BoardModel).filter(
             ListModel.id == id,
             BoardModel.user_id == self.current_user.id
         ).first()
         if not list_item:
             abort(404, message="List not found or access denied")
+        
+        # Protected lists that cannot be deleted
+        PROTECTED_LISTS = ['Backlog', 'To Do', 'In Progress', 'Testing', 'Done']
+        if list_item.title in PROTECTED_LISTS:
+            abort(400, message=f"Cannot delete '{list_item.title}' - This is a protected system list")
             
         db.session.delete(list_item)
         db.session.commit()

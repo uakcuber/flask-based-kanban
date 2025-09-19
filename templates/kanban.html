@@ -120,13 +120,80 @@
             transform: rotate(5deg);
         }
 
+        /* Task card smooth transitions */
+        .task-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Task card pseudo-element for smooth background transition */
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 35%, #2563eb 70%, #1d4ed8 100%);
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+            border-radius: inherit;
+        }
+
         /* Task card hover effects */
         .task-card:hover {
             transform: translateY(-2px);
             box-shadow: 
-                0 20px 25px -5px rgba(125, 211, 252, 0.15), 
-                0 10px 10px -5px rgba(56, 189, 248, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                0 20px 25px -5px rgba(96, 165, 250, 0.4), 
+                0 15px 15px -5px rgba(59, 130, 246, 0.3),
+                0 10px 10px -5px rgba(37, 99, 235, 0.2),
+                0 5px 5px -2px rgba(29, 78, 216, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .task-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Task card text smooth transitions */
+        .task-card h4,
+        .task-card p,
+        .task-card .text-gray-500,
+        .task-card .text-gray-600,
+        .task-card .text-gray-800,
+        .task-card span {
+            transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Task card hover text colors */
+        .task-card:hover h4,
+        .task-card:hover p,
+        .task-card:hover .text-gray-500,
+        .task-card:hover .text-gray-600,
+        .task-card:hover .text-gray-800 {
+            color: white !important;
+        }
+
+        /* Task card hover priority badge */
+        .task-card:hover span[class*="bg-gradient-to-r"] {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Delete button smooth transition */
+        .task-card button {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .task-card:hover button {
+            color: white !important;
+        }
+
+        .task-card:hover button:hover {
+            color: #fca5a5 !important;
         }
 
         /* List container enhanced glass effect */
@@ -208,6 +275,14 @@
                 </div>
                 
                 <div class="flex items-center space-x-3">
+                    <!-- Scroll Info Button -->
+                    <button onclick="toggleScrollInfo()" 
+                            class="inline-flex items-center px-3 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 
+                                   text-ice-600 rounded-lg hover:bg-white/20 transition-all duration-200 group"
+                            title="Scroll Controls">
+                        <i class="ri-mouse-line group-hover:animate-bounce"></i>
+                    </button>
+                    
                     <button onclick="openAddListModal()" 
                             class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-ice-500 to-blue-600 
                                    text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 
@@ -255,10 +330,82 @@
         </div>
     </div>
 
+    <!-- Scroll Info Tooltip -->
+    <div id="scrollInfo" class="fixed top-20 left-6 z-50 hidden animate-slide-in">
+        <div class="p-4 text-sm text-blue-800 rounded-lg bg-blue-50/90 border border-blue-200 shadow-lg backdrop-blur-sm glass-card" role="alert">
+            <div class="space-y-2">
+                <div class="flex items-center mb-2">
+                    <i class="ri-mouse-line text-lg mr-2"></i>
+                    <span class="font-medium">Scroll Controls</span>
+                    <button onclick="hideScrollInfo()" class="ml-auto text-blue-600 hover:text-blue-800">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div class="text-xs space-y-1">
+                    <div class="flex items-center">
+                        <span class="w-20 font-mono bg-blue-100 px-1 rounded">Wheel</span>
+                        <span class="ml-2">→ Horizontal scroll</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-20 font-mono bg-blue-100 px-1 rounded">Shift+Wheel</span>
+                        <span class="ml-2">→ Vertical scroll</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-20 font-mono bg-blue-100 px-1 rounded">Ctrl+Wheel</span>
+                        <span class="ml-2">→ Zoom in/out</span>
+                    </div>
+                    <div class="text-blue-600 text-xs mt-2">
+                        <i class="ri-information-line mr-1"></i>
+                        Works everywhere except inside task cards
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black/50 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-md max-h-full animate-slide-in">
+            <div class="relative backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 glass-card" style="background-color: #C7E9FC;">
+                <button type="button" onclick="hideDeleteModal()" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-red-100/50 hover:text-red-600 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center transition-all duration-200">
+                    <i class="ri-close-line text-lg"></i>
+                    <span class="sr-only">Close modal</span>
+                </button>
+                
+                <div class="p-6 text-center">
+                    <div class="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-red-100 to-red-200 rounded-full flex items-center justify-center">
+                        <i class="ri-delete-bin-line text-2xl text-red-600"></i>
+                    </div>
+                    
+                    <h3 id="deleteModalTitle" class="mb-3 text-lg font-bold text-gray-800">
+                        Are you sure?
+                    </h3>
+                    
+                    <p id="deleteModalMessage" class="mb-6 text-sm text-gray-600 leading-relaxed">
+                        This action cannot be undone.
+                    </p>
+                    
+                    <div class="flex items-center justify-center space-x-3">
+                        <button id="confirmDeleteBtn" type="button" 
+                                class="text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-semibold rounded-lg text-sm px-6 py-2.5 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                            <i class="ri-check-line mr-2"></i>
+                            Yes, Delete
+                        </button>
+                        <button onclick="hideDeleteModal()" type="button" 
+                                class="px-6 py-2.5 text-sm font-semibold text-ice-700 focus:outline-none bg-white/80 rounded-lg border border-ice-200 hover:bg-ice-50 hover:text-ice-800 focus:z-10 focus:ring-4 focus:ring-ice-100 transition-all duration-200 backdrop-blur-sm">
+                            <i class="ri-close-line mr-2"></i>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Kanban Board -->
     <main class="flex-1 overflow-hidden">
-        <div id="kanbanContainer" class="h-full p-6">
-            <div id="kanbanBoard" class="flex space-x-6 h-full overflow-x-auto scrollbar-hide pb-6">
+        <div id="kanbanContainer" class="h-full p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-ice-300">
+            <div id="kanbanBoard" class="flex space-x-6 h-full overflow-x-auto scrollbar-hide pb-6 min-h-fit">
                 <!-- Default Lists: Backlog, To Do, In Progress, Testing, Done -->
                 <!-- Lists will be dynamically loaded here -->
             </div>
@@ -499,6 +646,9 @@
             createSortableBoard();
         }
 
+        // Protected lists that cannot be deleted
+        const PROTECTED_LISTS = ['Backlog', 'To Do', 'In Progress', 'Testing', 'Done'];
+
         // Create list element
         function createListElement(list) {
             const listDiv = document.createElement('div');
@@ -506,6 +656,7 @@
             listDiv.dataset.listId = list.id;
             
             const tasks = (list.tasks || []).sort((a, b) => (a.position || 0) - (b.position || 0));
+            const isProtected = PROTECTED_LISTS.includes(list.title);
             
             listDiv.innerHTML = `
                 <div class="bg-white/30 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 overflow-hidden h-full max-h-[calc(100vh-180px)]">
@@ -518,11 +669,24 @@
                                 <span class="text-xs font-semibold text-ice-600 bg-ice-200/60 px-2 py-1 rounded-full">
                                     ${tasks.length}
                                 </span>
+                                ${isProtected ? `
+                                    <span class="text-xs text-ice-500 bg-ice-100/50 px-2 py-1 rounded-full border border-ice-200" title="Protected list - cannot be deleted">
+                                        <i class="ri-shield-check-line"></i>
+                                    </span>
+                                ` : ''}
                             </div>
-                            <button onclick="openAddTaskModal(${list.id})" 
-                                    class="text-ice-600 hover:text-ice-800 hover:bg-white/50 p-2 rounded-lg transition-all duration-200 transform hover:scale-110 group">
-                                <i class="ri-add-line text-xl group-hover:rotate-90 transition-transform duration-200"></i>
-                            </button>
+                            <div class="flex items-center space-x-1">
+                                <button onclick="openAddTaskModal(${list.id})" 
+                                        class="text-ice-600 hover:text-ice-800 hover:bg-white/50 p-2 rounded-lg transition-all duration-200 transform hover:scale-110 group">
+                                    <i class="ri-add-line text-xl group-hover:rotate-90 transition-transform duration-200"></i>
+                                </button>
+                                ${!isProtected ? `
+                                    <button onclick="deleteList(${list.id}, '${list.title}')" 
+                                            class="text-gray-400 hover:text-red-500 hover:bg-red-50/50 p-2 rounded-lg transition-all duration-200 transform hover:scale-110 group">
+                                        <i class="ri-delete-bin-line text-lg group-hover:animate-pulse"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
                     
@@ -581,7 +745,7 @@
             const priority = priorityConfig[task.priority] || priorityConfig.medium;
             
             return `
-                <div class="task-card bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/40 cursor-grab active:cursor-grabbing transform transition-all duration-200 hover:scale-[1.02] hover:shadow-xl group ${priority.bg}/30" 
+                <div class="task-card bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/40 cursor-grab active:cursor-grabbing group ${priority.bg}/30 relative z-10" 
                      data-task-id="${task.id}" draggable="true">
                     
                     <div class="flex items-start justify-between mb-3">
@@ -708,23 +872,75 @@
 
         // Delete task
         async function deleteTask(taskId) {
-            if (!confirm('Are you sure you want to delete this task?')) return;
+            // Get task title for better UX
+            const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+            const taskTitle = taskElement ? taskElement.querySelector('h4').textContent.trim() : 'this task';
             
-            try {
-                const response = await fetch(`/api/tasks/${taskId}`, {
-                    method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                    showSuccessAlert('Task deleted successfully! 🗑️');
-                    await loadBoard();
-                } else {
-                    showErrorAlert('Failed to delete task. Please try again.');
+            showDeleteModal(
+                'Delete Task',
+                `Are you sure you want to delete "${taskTitle}"? This action cannot be undone.`,
+                async () => {
+                    try {
+                        const response = await fetch(`/api/tasks/${taskId}`, {
+                            method: 'DELETE'
+                        });
+                        
+                        if (response.ok) {
+                            showSuccessAlert('Task deleted successfully! 🗑️');
+                            await loadBoard();
+                        } else {
+                            showErrorAlert('Failed to delete task. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error deleting task:', error);
+                        showErrorAlert('Error occurred while deleting task.');
+                    }
                 }
-            } catch (error) {
-                console.error('Error deleting task:', error);
-                showErrorAlert('Error occurred while deleting task.');
+            );
+        }
+
+        // Delete list
+        async function deleteList(listId, listTitle) {
+            // Double check if it's a protected list
+            if (PROTECTED_LISTS.includes(listTitle)) {
+                showErrorAlert(`Cannot delete "${listTitle}" - This is a protected system list.`);
+                return;
             }
+
+            // Get tasks count for warning
+            const listElement = document.querySelector(`[data-list-id="${listId}"]`);
+            const tasksCount = listElement ? listElement.querySelectorAll('.task-card').length : 0;
+            
+            let modalTitle = 'Delete List';
+            let modalMessage = `Are you sure you want to delete the list "${listTitle}"?`;
+            
+            if (tasksCount > 0) {
+                modalTitle = `⚠️ Delete List & ${tasksCount} Tasks`;
+                modalMessage = `Are you sure you want to delete the list "${listTitle}"?\n\nThis list contains ${tasksCount} task(s). All tasks will be permanently deleted and cannot be recovered!`;
+            }
+            
+            showDeleteModal(
+                modalTitle,
+                modalMessage,
+                async () => {
+                    try {
+                        const response = await fetch(`/api/lists/${listId}`, {
+                            method: 'DELETE'
+                        });
+                        
+                        if (response.ok) {
+                            showSuccessAlert(`List "${listTitle}" deleted successfully! 🗑️`);
+                            await loadBoard();
+                        } else {
+                            const error = await response.json();
+                            showErrorAlert(error.message || 'Failed to delete list. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error deleting list:', error);
+                        showErrorAlert('Error occurred while deleting list.');
+                    }
+                }
+            );
         }
 
         // Form submissions
@@ -826,6 +1042,59 @@
             }, 300);
         }
 
+        // Scroll info functions
+        function toggleScrollInfo() {
+            const scrollInfo = document.getElementById('scrollInfo');
+            if (scrollInfo.classList.contains('hidden')) {
+                scrollInfo.classList.remove('hidden');
+                // Auto hide after 8 seconds
+                setTimeout(() => {
+                    hideScrollInfo();
+                }, 8000);
+            } else {
+                hideScrollInfo();
+            }
+        }
+
+        function hideScrollInfo() {
+            const scrollInfo = document.getElementById('scrollInfo');
+            scrollInfo.classList.add('opacity-0');
+            setTimeout(() => {
+                scrollInfo.classList.add('hidden');
+                scrollInfo.classList.remove('opacity-0');
+            }, 300);
+        }
+
+        // Delete modal functions
+        let pendingDeleteAction = null;
+        
+        function showDeleteModal(title, message, confirmCallback) {
+            document.getElementById('deleteModalTitle').textContent = title;
+            document.getElementById('deleteModalMessage').textContent = message;
+            pendingDeleteAction = confirmCallback;
+            
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function hideDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            pendingDeleteAction = null;
+        }
+        
+        // Confirm delete button handler
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                if (pendingDeleteAction) {
+                    pendingDeleteAction();
+                    hideDeleteModal();
+                }
+            });
+        });
+
         // Utility functions
         function logout() {
             window.location.href = '/logout';
@@ -844,15 +1113,33 @@
             }
         });
 
-        // Mouse wheel horizontal scrolling - only when not hovering over task containers
-        document.getElementById('kanbanBoard').addEventListener('wheel', function(e) {
-            // Check if we're hovering over a task container or task card
-            const target = e.target.closest('.tasks-container, .task-card, .scrollable-area');
+        // Enhanced wheel scrolling - horizontal and vertical when not over task cards
+        document.addEventListener('wheel', function(e) {
+            // Check if we're hovering over a task container, task card, or scrollable area
+            const target = e.target.closest('.tasks-container, .task-card, .scrollable-area, .modal');
             
-            // If we're not hovering over scrollable content, do horizontal scroll
-            if (!target && e.deltaY !== 0) {
-                e.preventDefault();
-                this.scrollLeft += e.deltaY;
+            // If we're not hovering over scrollable content, handle custom scroll
+            if (!target) {
+                const kanbanBoard = document.getElementById('kanbanBoard');
+                const kanbanContainer = document.getElementById('kanbanContainer');
+                
+                if (kanbanBoard && kanbanContainer) {
+                    e.preventDefault();
+                    
+                    // Shift + wheel = vertical scroll
+                    if (e.shiftKey) {
+                        kanbanContainer.scrollTop += e.deltaY;
+                    } 
+                    // Ctrl + wheel = zoom (browser default, don't prevent)
+                    else if (e.ctrlKey) {
+                        // Let browser handle zoom
+                        return;
+                    }
+                    // Regular wheel = horizontal scroll
+                    else {
+                        kanbanBoard.scrollLeft += e.deltaY;
+                    }
+                }
             }
         });
 
