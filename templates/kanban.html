@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .kanban-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .kanban-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .kanban-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: #5087af;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #3d6b8a;
+            transform: translateY(-2px);
+        }
+
+        .kanban-board {
+            display: flex;
+            gap: 1.5rem;
+            padding: 2rem;
+            overflow-x: auto;
+            min-height: calc(100vh - 80px);
+        }
+
+        .kanban-list {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            min-width: 300px;
+            max-width: 300px;
+            padding: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .list-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .add-task-btn {
+            background: #f0f0f0;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-task-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: grab;
+            transition: all 0.3s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .task-description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .priority-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .priority-high { background: #ff6b6b; color: white; }
+        .priority-medium { background: #ffd93d; color: #333; }
+        .priority-low { background: #6bcf7f; color: white; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 10% auto;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #5087af;
+        }
+
+        .btn-primary {
+            background: #5087af;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #3d6b8a;
+        }
+    </style>
+</head>
+<body>
+    <div class="kanban-header">
+        <h1 class="kanban-title">My Kanban Board{% if user %} - Welcome {{ user.name }}!{% endif %}</h1>
+        <div class="kanban-actions">
+            <button class="btn" onclick="openNewListModal()">
+                <i class="ri-add-line"></i> Add List
+            </button>
+            <button class="btn" onclick="logout()">
+                <i class="ri-logout-box-line"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <div class="kanban-board" id="kanbanBoard">
+        <!-- Lists will be loaded here -->
+    </div>
+
+    <!-- New List Modal -->
+    <div id="newListModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('newListModal')">&times;</span>
+            <h2>Create New List</h2>
+            <form id="newListForm">
+                <div class="form-group">
+                    <label for="listTitle">List Title</label>
+                    <input type="text" id="listTitle" name="title" required>
+                </div>
+                <button type="submit" class="btn-primary">Create List</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Task Modal -->
+    <div id="newTaskModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('newTaskModal')">&times;</span>
+            <h2>Create New Task</h2>
+            <form id="newTaskForm">
+                <div class="form-group">
+                    <label for="taskTitle">Task Title</label>
+                    <input type="text" id="taskTitle" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Description</label>
+                    <textarea id="taskDescription" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="taskPriority">Priority</label>
+                    <select id="taskPriority" name="priority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <input type="hidden" id="taskListId" name="list_id">
+                <button type="submit" class="btn-primary">Create Task</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentBoardId = null;
+        let currentTaskListId = null;
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBoards();
+        });
+
+        async function loadBoards() {
+            try {
+                const response = await fetch('/api/boards/');
+                if (response.status === 401) {
+                    // User not authenticated, redirect to login
+                    window.location.href = '/';
+                    return;
+                }
+                
+                if (response.ok) {
+                    const boards = await response.json();
+                    if (boards.length > 0) {
+                        currentBoardId = boards[0].id;
+                        await loadBoard();
+                    } else {
+                        // Create a default board if none exists
+                        await createDefaultBoard();
+                    }
+                } else {
+                    console.error('Failed to load boards');
+                }
+            } catch (error) {
+                console.error('Error loading boards:', error);
+                window.location.href = '/'; // Redirect to login on error
+            }
+        }
+
+        async function loadBoard() {
+            if (!currentBoardId) return;
+            
+            try {
+                const response = await fetch(`/api/boards/${currentBoardId}`);
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                if (response.ok) {
+                    const board = await response.json();
+                    renderBoard(board);
+                } else {
+                    console.error('Failed to load board');
+                }
+            } catch (error) {
+                console.error('Error loading board:', error);
+            }
+        }
+
+        async function createDefaultBoard() {
+            try {
+                const response = await fetch('/api/boards/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: 'My Kanban Board',
+                        description: 'Default board'
+                    })
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                if (response.ok) {
+                    const board = await response.json();
+                    currentBoardId = board.id;
+                    renderBoard(board);
+                } else {
+                    console.error('Failed to create default board');
+                }
+            } catch (error) {
+                console.error('Error creating default board:', error);
+            }
+        }
+
+        function createSampleData() {
+            const sampleBoard = {
+                title: 'My Kanban Board',
+                lists: [
+                    {
+                        id: 1,
+                        title: 'To Do',
+                        tasks: [
+                            {
+                                id: 1,
+                                title: 'Design login page',
+                                description: 'Create beautiful login form with animations',
+                                priority: 'high'
+                            },
+                            {
+                                id: 2,
+                                title: 'Setup database',
+                                description: 'Configure SQLAlchemy models',
+                                priority: 'medium'
+                            }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: 'In Progress',
+                        tasks: [
+                            {
+                                id: 3,
+                                title: 'Implement Kanban API',
+                                description: 'Create REST endpoints for kanban functionality',
+                                priority: 'high'
+                            }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: 'Done',
+                        tasks: [
+                            {
+                                id: 4,
+                                title: 'Project setup',
+                                description: 'Initialize Flask project structure',
+                                priority: 'low'
+                            }
+                        ]
+                    }
+                ]
+            };
+            renderBoard(sampleBoard);
+        }
+
+        function renderBoard(board) {
+            const boardContainer = document.getElementById('kanbanBoard');
+            boardContainer.innerHTML = '';
+
+            if (!board.lists || board.lists.length === 0) {
+                boardContainer.innerHTML = '<p style="color: white; text-align: center; width: 100%;">No lists yet. Click "Add List" to get started!</p>';
+                return;
+            }
+
+            board.lists.forEach(list => {
+                const listElement = createListElement(list);
+                boardContainer.appendChild(listElement);
+            });
+        }
+
+        function createListElement(list) {
+            const listDiv = document.createElement('div');
+            listDiv.className = 'kanban-list';
+            listDiv.innerHTML = `
+                <div class="list-header">
+                    <h3 class="list-title">${list.title}</h3>
+                    <button class="add-task-btn" onclick="openNewTaskModal(${list.id})">
+                        <i class="ri-add-line"></i>
+                    </button>
+                </div>
+                <div class="tasks-container">
+                    ${(list.tasks || []).map(task => createTaskElement(task)).join('')}
+                </div>
+            `;
+            return listDiv;
+        }
+
+        function createTaskElement(task) {
+            return `
+                <div class="task-card" draggable="true">
+                    <div class="task-title">${task.title}</div>
+                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                    <div class="task-meta">
+                        <span class="priority-badge priority-${task.priority}">${task.priority.toUpperCase()}</span>
+                        <span>${new Date().toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Modal functions
+        function openNewListModal() {
+            document.getElementById('newListModal').style.display = 'block';
+        }
+
+        function openNewTaskModal(listId) {
+            currentTaskListId = listId;
+            document.getElementById('taskListId').value = listId;
+            document.getElementById('newTaskModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Logout function
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        // Form submissions
+        document.getElementById('newListForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/api/lists/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: formData.get('title'),
+                        board_id: currentBoardId
+                    })
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                if (response.ok) {
+                    closeModal('newListModal');
+                    e.target.reset();
+                    loadBoard(); // Reload the board
+                } else {
+                    alert('Failed to create list');
+                }
+            } catch (error) {
+                console.error('Error creating list:', error);
+            }
+        });
+
+        document.getElementById('newTaskForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/api/tasks/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: formData.get('title'),
+                        description: formData.get('description'),
+                        priority: formData.get('priority'),
+                        list_id: parseInt(formData.get('list_id'))
+                    })
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                if (response.ok) {
+                    closeModal('newTaskModal');
+                    e.target.reset();
+                    loadBoard(); // Reload the board
+                } else {
+                    alert('Failed to create task');
+                }
+            } catch (error) {
+                console.error('Error creating task:', error);
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

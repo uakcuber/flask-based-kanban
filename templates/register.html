@@ -16,7 +16,7 @@
       <div class="login">
          <img src="{{ url_for('static', filename='img/login-bg.png') }}" alt="image" class="login__bg">
 
-         <form action="" method="POST" class="login__form">
+         <form action="" method="POST" class="login__form" novalidate>
             <h1 class="login__title">Register</h1>
 
             <div class="login__inputs">
@@ -52,10 +52,123 @@
          {% if messages %}
             <script>
                {% for message in messages %}
-                  alert("{{ message }}");
+                  showSuccessMessage("{{ message }}");
                {% endfor %}
             </script>
          {% endif %}
       {% endwith %}
+
+      <script>
+         // Custom validation functions
+         function showError(element, message) {
+            // Remove existing error
+            clearError(element);
+            
+            // Add error class to input box or check box
+            const container = element.closest('.login__box') || element.closest('.login__check-box');
+            container.classList.add('error');
+            container.style.position = 'relative';
+            
+            // Create error message element
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            // Add to container
+            container.appendChild(errorDiv);
+            
+            // Show with animation
+            setTimeout(() => {
+               errorDiv.classList.add('show');
+            }, 50);
+         }
+
+         function clearError(element) {
+            const container = element.closest('.login__box') || element.closest('.login__check-box');
+            container.classList.remove('error');
+            const existingError = container.querySelector('.error-message');
+            if (existingError) {
+               existingError.remove();
+            }
+         }
+
+         function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            document.body.appendChild(successDiv);
+            
+            setTimeout(() => {
+               successDiv.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+               successDiv.classList.remove('show');
+               setTimeout(() => {
+                  successDiv.remove();
+               }, 400);
+            }, 4000);
+         }
+
+         function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+         }
+
+         // Form validation
+         document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.login__form');
+            const nameInput = document.querySelector('input[name="name"]');
+            const emailInput = document.querySelector('input[name="email"]');
+            const termsCheckbox = document.querySelector('#user-check');
+
+            // Clear errors when user starts typing/checking (after they've seen the error)
+            [nameInput, emailInput].forEach(input => {
+               input.addEventListener('input', function() {
+                  clearError(this);
+               });
+            });
+
+            termsCheckbox.addEventListener('change', function() {
+               clearError(this);
+            });
+
+            // Form submit validation - only show errors when trying to submit
+            form.addEventListener('submit', function(e) {
+               let hasErrors = false;
+
+               // Clear previous errors
+               [nameInput, emailInput, termsCheckbox].forEach(input => clearError(input));
+
+               // Validate name
+               if (!nameInput.value.trim()) {
+                  showError(nameInput, 'Name is required');
+                  hasErrors = true;
+               } else if (nameInput.value.trim().length < 2) {
+                  showError(nameInput, 'Name must be at least 2 characters');
+                  hasErrors = true;
+               }
+
+               // Validate email
+               if (!emailInput.value.trim()) {
+                  showError(emailInput, 'Email is required');
+                  hasErrors = true;
+               } else if (!validateEmail(emailInput.value)) {
+                  showError(emailInput, 'Please enter a valid email');
+                  hasErrors = true;
+               }
+
+               // Validate terms checkbox
+               if (!termsCheckbox.checked) {
+                  showError(termsCheckbox, 'Please agree to terms');
+                  hasErrors = true;
+               }
+
+               if (hasErrors) {
+                  e.preventDefault();
+               }
+            });
+         });
+      </script>
    </body>
 </html>

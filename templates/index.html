@@ -16,7 +16,7 @@
       <div class="login">
          <img src="{{ url_for('static', filename='img/login-bg.png') }}" alt="image" class="login__bg">
 
-         <form action="" method="POST" class="login__form">
+         <form action="" method="POST" class="login__form" novalidate>
             <h1 class="login__title">Login</h1>
 
             <div class="login__inputs">
@@ -52,10 +52,109 @@
          {% if messages %}
             <script>
                {% for message in messages %}
-                  alert("{{ message }}");
+                  showSuccessMessage("{{ message }}");
                {% endfor %}
             </script>
          {% endif %}
       {% endwith %}
+
+      <script>
+         // Custom validation functions
+         function showError(element, message) {
+            // Remove existing error
+            clearError(element);
+            
+            // Add error class to input box
+            const inputBox = element.closest('.login__box');
+            inputBox.classList.add('error');
+            inputBox.style.position = 'relative';
+            
+            // Create error message element
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            // Add to input box
+            inputBox.appendChild(errorDiv);
+            
+            // Show with animation
+            setTimeout(() => {
+               errorDiv.classList.add('show');
+            }, 50);
+         }
+
+         function clearError(element) {
+            const inputBox = element.closest('.login__box');
+            inputBox.classList.remove('error');
+            const existingError = inputBox.querySelector('.error-message');
+            if (existingError) {
+               existingError.remove();
+            }
+         }
+
+         function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            document.body.appendChild(successDiv);
+            
+            setTimeout(() => {
+               successDiv.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+               successDiv.classList.remove('show');
+               setTimeout(() => {
+                  successDiv.remove();
+               }, 400);
+            }, 4000);
+         }
+
+         function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+         }
+
+         // Form validation
+         document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.login__form');
+            const emailInput = document.querySelector('input[name="email"]');
+            const passwordInput = document.querySelector('input[name="password"]');
+
+            // Clear errors when user starts typing (after they've seen the error)
+            [emailInput, passwordInput].forEach(input => {
+               input.addEventListener('input', function() {
+                  clearError(this);
+               });
+            });
+
+            // Form submit validation - only show errors when trying to submit
+            form.addEventListener('submit', function(e) {
+               let hasErrors = false;
+
+               // Clear previous errors
+               [emailInput, passwordInput].forEach(input => clearError(input));
+
+               // Validate email
+               if (!emailInput.value.trim()) {
+                  showError(emailInput, 'Email is required');
+                  hasErrors = true;
+               } else if (!validateEmail(emailInput.value)) {
+                  showError(emailInput, 'Please enter a valid email');
+                  hasErrors = true;
+               }
+
+               // Validate password
+               if (!passwordInput.value.trim()) {
+                  showError(passwordInput, 'Name is required');
+                  hasErrors = true;
+               }
+
+               if (hasErrors) {
+                  e.preventDefault();
+               }
+            });
+         });
+      </script>
    </body>
 </html>
