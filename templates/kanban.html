@@ -119,10 +119,11 @@
 
         /* Drag effects */
         .sortable-ghost {
-            opacity: 0.6;
-            transform: rotate(5deg);
-            background: rgba(59, 130, 246, 0.2) !important;
-            border: 2px dashed #3b82f6 !important;
+            opacity: 0.4;
+            transform: scale(0.95);
+            background: rgba(59, 130, 246, 0.15) !important;
+            border: 2px dashed rgba(59, 130, 246, 0.5) !important;
+            transition: all 0.2s ease !important;
         }
         
         .sortable-chosen {
@@ -130,9 +131,11 @@
         }
         
         .sortable-drag {
-            transform: rotate(5deg) scale(1.05) !important;
+            transform: scale(1.05) !important;
             z-index: 1000 !important;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4) !important;
+            opacity: 0.9 !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
         /* Task card smooth transitions */
@@ -144,6 +147,12 @@
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
+            outline: none !important;
+        }
+        
+        .task-card:focus {
+            outline: none !important;
+            border: 1px solid transparent !important;
         }
         
         /* Enable pointer events for drag */
@@ -170,12 +179,13 @@
         /* Task card hover effects */
         .task-card:hover {
             transform: translateY(-2px);
+            border: 1px solid transparent !important;
+            outline: none !important;
             box-shadow: 
                 0 20px 25px -5px rgba(96, 165, 250, 0.4), 
                 0 15px 15px -5px rgba(59, 130, 246, 0.3),
                 0 10px 10px -5px rgba(37, 99, 235, 0.2),
-                0 5px 5px -2px rgba(29, 78, 216, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                0 5px 5px -2px rgba(29, 78, 216, 0.1);
         }
 
         .task-card:hover::before {
@@ -764,9 +774,9 @@
                         swapThreshold: 0.65,
                         onStart: function(evt) {
                             console.log('🎯 Drag started:', evt.item);
-                            // Remove any transform that might interfere
-                            evt.item.style.position = 'relative';
+                            evt.item.style.transform = 'scale(1.05)';
                             evt.item.style.zIndex = '1000';
+                            evt.item.style.opacity = '0.9';
                             document.body.style.cursor = 'grabbing';
                         },
                         onMove: function(evt) {
@@ -775,9 +785,17 @@
                         },
                         onEnd: function(evt) {
                             console.log('🎯 Drag ended:', evt.item, 'from', evt.from, 'to', evt.to);
-                            evt.item.style.position = '';
+                            evt.item.style.transform = 'scale(1)';
                             evt.item.style.zIndex = '';
+                            evt.item.style.opacity = '';
                             document.body.style.cursor = '';
+                            
+                            // Smooth transition back to normal
+                            evt.item.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+                            setTimeout(() => {
+                                evt.item.style.transition = '';
+                            }, 200);
+                            
                             handleTaskMove(evt.item, evt.from, evt.to, evt.newIndex);
                         }
                     });
