@@ -1,5 +1,6 @@
-# Database files - only ignore large/temp databases
-# instance/database.db  # Keep this commented for now
+# Database files - binary files cause Git conflicts
+instance/
+*.db
 *.db-journal
 *.db-wal
 *.db-shm

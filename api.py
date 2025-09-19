@@ -22,13 +22,6 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# Create tables within application context
-with app.app_context():
-    if not os.path.exists(os.path.join(basedir, "instance")):
-        os.makedirs(os.path.join(basedir, "instance"))
-    db.create_all()
-    print("Database tables created successfully!")
-
 # Authentication helpers
 def login_required(f):
     """Decorator to require login for routes"""
@@ -695,6 +688,13 @@ def test_users_api(client):
     assert response.status_code in [200, 404]  # Either success or no users found
 
 
+
+# Initialize database after all models are defined
+with app.app_context():
+    if not os.path.exists(os.path.join(basedir, "instance")):
+        os.makedirs(os.path.join(basedir, "instance"))
+    db.create_all()
+    print("✅ Database tables created successfully!")
 
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=5001)
