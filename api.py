@@ -220,6 +220,40 @@ def success():
 def unsuccess():
     return render_template('unsuccess.html')
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        print("🔍 DEBUG: Register form submitted")
+        name = request.form.get("name")
+        email = request.form.get("email")
+        
+        print(f"🔍 DEBUG: name='{name}', email='{email}'")
+        
+        if not name or not email:
+            print("❌ DEBUG: Missing fields")
+            flash("Please fill in all fields.")
+            return redirect(url_for("unsuccess"))
+        
+        # Check if user already exists
+        existing_user = UserModel.query.filter_by(email=email).first()
+        if existing_user:
+            print("❌ DEBUG: User already exists")
+            flash("A user with this email already exists.")
+            return redirect(url_for("unsuccess"))
+        
+        # Create new user
+        user = UserModel(email=email)
+        user.set_name_as_password(name)
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        print("✅ DEBUG: User registered successfully")
+        flash(f"Registration successful! Welcome {user.name}! You can now login.")
+        return redirect(url_for("success"))
+
+    return render_template('register.html')
+
 
 
 @pytest.fixture
