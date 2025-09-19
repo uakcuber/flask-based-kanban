@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board - Flask Project</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Flowbite CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
+    
+    <!-- Remix Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.css">
+    
+    <!-- SortableJS for Drag & Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ice: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe', 
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e'
+                        }
+                    },
+                    backdropBlur: {
+                        'xs': '2px',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-in': 'slideIn 0.3s ease-out',
+                        'bounce-soft': 'bounceSoft 2s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(-100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        bounceSoft: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar styles */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-thin {
+            scrollbar-width: thin;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .scrollbar-thumb-ice-300::-webkit-scrollbar-thumb {
+            background-color: #7dd3fc;
+            border-radius: 3px;
+        }
+        .scrollbar-track-transparent::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* Line clamp utility */
+        .line-clamp-2 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+
+        /* Drag ghost effect */
+        .sortable-ghost {
+            opacity: 0.6;
+            transform: rotate(5deg);
+        }
+
+        /* Task card hover effects */
+        .task-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Glass morphism background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(56, 189, 248, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(14, 165, 233, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+
+    </style>
+</head>
+<body class="h-full bg-gradient-to-br from-ice-50 via-blue-50 to-ice-100 overflow-hidden">
+    
+    <!-- Header with Glass Effect -->
+    <header class="backdrop-blur-xl bg-white/20 border-b border-white/30 shadow-lg sticky top-0 z-50">
+        <div class="px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-ice-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                        <i class="ri-dashboard-3-line text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-ice-700 to-blue-800 bg-clip-text text-transparent">
+                            Kanban Board
+                        </h1>
+                        {% if user %}
+                        <p class="text-sm text-ice-600 font-medium">Welcome back, {{ user.name }}! 👋</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <button onclick="openAddListModal()" 
+                            class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-ice-500 to-blue-600 
+                                   text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 
+                                   transition-all duration-200 backdrop-blur-sm">
+                        <i class="ri-add-line mr-2"></i>
+                        Add List
+                    </button>
+                    
+                    <button onclick="logout()" 
+                            class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 
+                                   text-ice-700 font-medium rounded-lg hover:bg-white/30 transition-all duration-200">
+                        <i class="ri-logout-box-line mr-2"></i>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Kanban Board -->
+    <main class="flex-1 overflow-hidden">
+        <div id="kanbanContainer" class="h-full p-6">
+            <div id="kanbanBoard" class="flex space-x-6 h-full overflow-x-auto scrollbar-hide pb-6">
+                <!-- Lists will be dynamically loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Add List Modal -->
+    <div id="addListModal" tabindex="-1" aria-hidden="true" 
+         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black/50 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30">
+                <div class="flex items-center justify-between p-4 md:p-5 border-b border-gray-200/50 rounded-t-2xl bg-gradient-to-r from-ice-50/80 to-blue-50/80">
+                    <h3 class="text-lg font-semibold text-ice-800">
+                        <i class="ri-add-box-line mr-2"></i>Create New List
+                    </h3>
+                    <button onclick="closeAddListModal()" type="button" 
+                            class="text-gray-400 bg-transparent hover:bg-gray-200/50 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="addListForm" class="p-4 md:p-5">
+                    <div class="grid gap-4 mb-4">
+                        <div>
+                            <label for="listTitle" class="block mb-2 text-sm font-medium text-ice-800">List Title</label>
+                            <input type="text" id="listTitle" name="title" 
+                                   class="bg-white/50 border border-ice-200 text-ice-900 text-sm rounded-xl focus:ring-ice-500 focus:border-ice-500 block w-full p-3 backdrop-blur-sm"
+                                   placeholder="Enter list title..." required>
+                        </div>
+                    </div>
+                    <button type="submit" 
+                            class="w-full text-white bg-gradient-to-r from-ice-500 to-blue-600 hover:from-ice-600 hover:to-blue-700 
+                                   focus:ring-4 focus:outline-none focus:ring-ice-300 font-medium rounded-xl text-sm px-5 py-3 
+                                   text-center transform hover:scale-[1.02] transition-all duration-200 shadow-lg">
+                        <i class="ri-add-line mr-2"></i>Create List
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" tabindex="-1" aria-hidden="true" 
+         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black/50 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-lg max-h-full">
+            <div class="relative bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30">
+                <div class="flex items-center justify-between p-4 md:p-5 border-b border-gray-200/50 rounded-t-2xl bg-gradient-to-r from-ice-50/80 to-blue-50/80">
+                    <h3 class="text-lg font-semibold text-ice-800">
+                        <i class="ri-sticky-note-add-line mr-2"></i>Create New Task
+                    </h3>
+                    <button onclick="closeAddTaskModal()" type="button" 
+                            class="text-gray-400 bg-transparent hover:bg-gray-200/50 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="addTaskForm" class="p-4 md:p-5">
+                    <div class="grid gap-4 mb-4">
+                        <div>
+                            <label for="taskTitle" class="block mb-2 text-sm font-medium text-ice-800">Task Title</label>
+                            <input type="text" id="taskTitle" name="title" 
+                                   class="bg-white/50 border border-ice-200 text-ice-900 text-sm rounded-xl focus:ring-ice-500 focus:border-ice-500 block w-full p-3 backdrop-blur-sm"
+                                   placeholder="Enter task title..." required>
+                        </div>
+                        
+                        <div>
+                            <label for="taskDescription" class="block mb-2 text-sm font-medium text-ice-800">Description</label>
+                            <textarea id="taskDescription" name="description" rows="3"
+                                      class="bg-white/50 border border-ice-200 text-ice-900 text-sm rounded-xl focus:ring-ice-500 focus:border-ice-500 block w-full p-3 backdrop-blur-sm resize-none"
+                                      placeholder="Task description (optional)..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="taskPriority" class="block mb-2 text-sm font-medium text-ice-800">Priority</label>
+                            <select id="taskPriority" name="priority" 
+                                    class="bg-white/50 border border-ice-200 text-ice-900 text-sm rounded-xl focus:ring-ice-500 focus:border-ice-500 block w-full p-3 backdrop-blur-sm">
+                                <option value="low">🟢 Low Priority</option>
+                                <option value="medium" selected>🟡 Medium Priority</option>
+                                <option value="high">🔴 High Priority</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="taskListId" name="list_id">
+                    
+                    <button type="submit" 
+                            class="w-full text-white bg-gradient-to-r from-ice-500 to-blue-600 hover:from-ice-600 hover:to-blue-700 
+                                   focus:ring-4 focus:outline-none focus:ring-ice-300 font-medium rounded-xl text-sm px-5 py-3 
+                                   text-center transform hover:scale-[1.02] transition-all duration-200 shadow-lg">
+                        <i class="ri-add-line mr-2"></i>Create Task
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flowbite JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        let currentBoardId = null;
+        let currentTaskListId = null;
+        let sortableInstances = [];
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBoards();
+        });
+
+        async function loadBoards() {
+            try {
+                const response = await fetch('/api/boards/');
+                if (response.status === 401) {
+                    // User not authenticated, redirect to login
+                    window.location.href = '/';
+                    return;
+                }
+                
+                if (response.ok) {
+                    const boards = await response.json();
+                    if (boards.length > 0) {
+                        currentBoardId = boards[0].id;
+                        await loadBoard();
+                    } else {
+                        // Create a default board if none exists
+                        await createDefaultBoard();
+                    }
+                } else {
+                    console.error('Failed to load boards');
+                }
+            } catch (error) {
+                console.error('Error loading boards:', error);
+                window.location.href = '/'; // Redirect to login on error
+            }
+        }
+
+        async function loadBoard() {
+            if (!currentBoardId) return;
+            
+            try {
+                const response = await fetch(`/api/boards/${currentBoardId}`);
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                if (response.ok) {
+                    const board = await response.json();
+                    renderBoard(board);
+                } else {
+                    console.error('Failed to load board');
+                }
+            } catch (error) {
+                console.error('Error loading board:', error);
+            }
+        }
+
+        async function createDefaultBoard() {
+            try {
+                const response = await fetch('/api/boards/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: 'My Kanban Board',
+                        description: 'Default board'
+                    })
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                if (response.ok) {
+                    const board = await response.json();
+                    currentBoardId = board.id;
+                    renderBoard(board);
+                } else {
+                    console.error('Failed to create default board');
+                }
+            } catch (error) {
+                console.error('Error creating default board:', error);
+            }
+        }
+
+        function createSampleData() {
+            const sampleBoard = {
+                title: 'My Kanban Board',
+                lists: [
+                    {
+                        id: 1,
+                        title: 'To Do',
+                        tasks: [
+                            {
+                                id: 1,
+                                title: 'Design login page',
+                                description: 'Create beautiful login form with animations',
+                                priority: 'high'
+                            },
+                            {
+                                id: 2,
+                                title: 'Setup database',
+                                description: 'Configure SQLAlchemy models',
+                                priority: 'medium'
+                            }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: 'In Progress',
+                        tasks: [
+                            {
+                                id: 3,
+                                title: 'Implement Kanban API',
+                                description: 'Create REST endpoints for kanban functionality',
+                                priority: 'high'
+                            }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: 'Done',
+                        tasks: [
+                            {
+                                id: 4,
+                                title: 'Project setup',
+                                description: 'Initialize Flask project structure',
+                                priority: 'low'
+                            }
+                        ]
+                    }
+                ]
+            };
+            renderBoard(sampleBoard);
+        }
+
+        function renderBoard(board) {
+            const boardContainer = document.getElementById('kanbanBoard');
+            boardContainer.innerHTML = '';
+
+            if (!board.lists || board.lists.length === 0) {
+                boardContainer.innerHTML = '<p style="color: white; text-align: center; width: 100%;">No lists yet. Click "Add List" to get started!</p>';
+                return;
+            }
+
+            board.lists.forEach(list => {
+                const listElement = createListElement(list);
+                boardContainer.appendChild(listElement);
+            });
+        }
+
+        function createListElement(list) {
+            const listDiv = document.createElement('div');
+            listDiv.className = 'kanban-list';
+            listDiv.innerHTML = `
+                <div class="list-header">
+                    <h3 class="list-title">${list.title}</h3>
+                    <button class="add-task-btn" onclick="openNewTaskModal(${list.id})">
+                        <i class="ri-add-line"></i>
+                    </button>
+                </div>
+                <div class="tasks-container">
+                    ${(list.tasks || []).map(task => createTaskElement(task)).join('')}
+                </div>
+            `;
+            return listDiv;
+        }
+
+        function createTaskElement(task) {
+            return `
+                <div class="task-card" draggable="true">
+                    <div class="task-title">${task.title}</div>
+                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                    <div class="task-meta">
+                        <span class="priority-badge priority-${task.priority}">${task.priority.toUpperCase()}</span>
+                        <span>${new Date().toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Modal functions
+        function openNewListModal() {
+            document.getElementById('newListModal').style.display = 'block';
+        }
+
+        function openNewTaskModal(listId) {
+            currentTaskListId = listId;
+            document.getElementById('taskListId').value = listId;
+            document.getElementById('newTaskModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Logout function
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        // Form submissions
+        document.getElementById('newListForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/api/lists/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: formData.get('title'),
+                        board_id: currentBoardId
+                    })
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                if (response.ok) {
+                    closeModal('newListModal');
+                    e.target.reset();
+                    loadBoard(); // Reload the board
+                } else {
+                    alert('Failed to create list');
+                }
+            } catch (error) {
+                console.error('Error creating list:', error);
+            }
+        });
+
+        document.getElementById('newTaskForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/api/tasks/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: formData.get('title'),
+                        description: formData.get('description'),
+                        priority: formData.get('priority'),
+                        list_id: parseInt(formData.get('list_id'))
+                    })
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                if (response.ok) {
+                    closeModal('newTaskModal');
+                    e.target.reset();
+                    loadBoard(); // Reload the board
+                } else {
+                    alert('Failed to create task');
+                }
+            } catch (error) {
+                console.error('Error creating task:', error);
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

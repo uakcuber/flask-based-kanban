@@ -65,16 +65,35 @@ def api_auth_required(f):
 # Flask Error Handlers
 @app.errorhandler(404)
 def not_found(error):
-    return jsonify({"error": "Resource not found"}), 404
+    # API endpoint'leri için JSON response
+    if request.path.startswith('/api/'):
+        return jsonify({
+            "error": "API endpoint not found",
+            "message": f"The endpoint '{request.path}' does not exist",
+            "available_endpoints": [
+                "/api/users/", "/api/login", "/api/signup",
+                "/api/boards/", "/api/lists/", "/api/tasks/"
+            ]
+        }), 404
+    
+    # Web sayfaları için HTML template
+    return render_template('404.html'), 404
 
 @app.errorhandler(400)
 def bad_request(error):
-    return jsonify({"error": "Bad request"}), 400
+    if request.path.startswith('/api/'):
+        return jsonify({"error": "Bad request", "message": "Invalid request data"}), 400
+    return render_template('404.html'), 400
 
 @app.errorhandler(500)
 def internal_error(error):
     db.session.rollback()
-    return jsonify({"error": "Internal server error"}), 500
+    if request.path.startswith('/api/'):
+        return jsonify({
+            "error": "Internal server error",
+            "message": "Something went wrong on our end. Please try again later."
+        }), 500
+    return render_template('404.html'), 500
 
 @app.errorhandler(IntegrityError)
 def handle_integrity_error(error):
@@ -643,6 +662,11 @@ def logout():
     session.clear()
     flash("You have been logged out successfully.")
     return redirect(url_for("home"))
+
+@app.route("/test-404")
+def test_404():
+    """Test endpoint to demonstrate 404 page"""
+    abort(404)
 
 
 
