@@ -2,6 +2,11 @@ import pytest
 import json
 import os
 import tempfile
+import sys
+
+# Add parent directory to path to import from api.py
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from api import app, db, UserModel
 
 @pytest.fixture

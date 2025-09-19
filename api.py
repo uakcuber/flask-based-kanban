@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, abort, Resource, reqparse, fields, marshal_with
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.exceptions import BadRequest, NotFound, InternalServerError
+from sqlalchemy.exc import IntegrityError
 import os
 import pytest
 
@@ -21,13 +23,31 @@ db = SQLAlchemy(app)
 
 # Create tables within application context
 with app.app_context():
-    try:
-        if not os.path.exists(os.path.join(basedir, "instance")):
-            os.makedirs(os.path.join(basedir, "instance"))
-        db.create_all()
-        print("Database tables created successfully!")
-    except Exception as e:
-        print(f"Error creating database: {e}")
+    if not os.path.exists(os.path.join(basedir, "instance")):
+        os.makedirs(os.path.join(basedir, "instance"))
+    db.create_all()
+    print("Database tables created successfully!")
+
+# Flask Error Handlers
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({"error": "Resource not found"}), 404
+
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({"error": "Bad request"}), 400
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return jsonify({"error": "Internal server error"}), 500
+
+@app.errorhandler(IntegrityError)
+def handle_integrity_error(error):
+    db.session.rollback()
+    if "UNIQUE constraint" in str(error):
+        return jsonify({"error": "User with this name or email already exists"}), 400
+    return jsonify({"error": "Database constraint violation"}), 400
 
 
 class UserModel(db.Model):
@@ -59,83 +79,56 @@ userfields = {
     "email": fields.String
 }
 
-# JWT kısımları kaldırıldı - basit tutuyoruz
+
 
 class Users(Resource):
     @marshal_with(userfields)
     def get(self):
         """Kullanıcı listesi"""
-        try:
-            users = UserModel.query.all()
-            if not users:
-                abort(404, message="No users found")
-            return users
-        except Exception as e:
-            print(f"Database error: {e}")
-            abort(500, message="Internal server error occurred")
+        users = UserModel.query.all()
+        if not users:
+            abort(404, message="No users found")
+        return users
 
     @marshal_with(userfields)
     def post(self):
         """Yeni kullanıcı kaydı (public)"""
-        try:
-            args = user_args.parse_args()
-            user = UserModel(email=args["email"])
-            user.set_name_as_password(args["name"])  # Name'i hem username hem password olarak ayarla
-            db.session.add(user)
-            db.session.commit()
-            return user, 201
-        except Exception as e:
-            db.session.rollback()
-            print(f"Database error: {e}")
-            if "UNIQUE constraint" in str(e):
-                abort(400, message="User with this name or email already exists")
-            abort(500, message="Internal server error occurred")
+        args = user_args.parse_args()
+        user = UserModel(email=args["email"])
+        user.set_name_as_password(args["name"])  # Name'i hem username hem password olarak ayarla
+        db.session.add(user)
+        db.session.commit()
+        return user, 201
     
 
 class User(Resource):
     @marshal_with(userfields)
     def get(self, id):
-        try:
-            user = UserModel.query.filter_by(id=id).first()
-            if not user:
-                abort(404, message="User not found")
-            return user
-        except Exception as e:
-            print(f"Database error: {e}")
-            abort(500, message="Internal server error occurred")
+        user = UserModel.query.filter_by(id=id).first()
+        if not user:
+            abort(404, message="User not found")
+        return user
         
     @marshal_with(userfields)
     def patch(self, id):
-        try:
-            args = user_args.parse_args()
-            user = UserModel.query.filter_by(id=id).first()
-            if not user:
-                abort(404, message="User not found")
-            if args["name"]:
-                user.name = args["name"]
-            if args["email"]:
-                user.email = args["email"]
-            db.session.commit()
-            return user
-        except Exception as e:
-            db.session.rollback()
-            print(f"Database error: {e}")
-            if "UNIQUE constraint" in str(e):
-                abort(400, message="User with this name or email already exists")
-            abort(500, message="Internal server error occurred")
+        args = user_args.parse_args()
+        user = UserModel.query.filter_by(id=id).first()
+        if not user:
+            abort(404, message="User not found")
+        if args["name"]:
+            user.set_name_as_password(args["name"])  # Update name and hash
+        if args["email"]:
+            user.email = args["email"]
+        db.session.commit()
+        return user
         
-        def delete(self, id):
-            try:
-                user = UserModel.query.filter_by(id=id).first()
-                if not user:
-                    abort(404, message="User not found")
-                db.session.delete(user)
-                db.session.commit()
-                return '', 204
-            except Exception as e:
-                db.session.rollback()
-                print(f"Database error: {e}")
-                abort(500, message="Internal server error occurred")
+    def delete(self, id):
+        user = UserModel.query.filter_by(id=id).first()
+        if not user:
+            abort(404, message="User not found")
+        db.session.delete(user)
+        db.session.commit()
+        return '', 204
                 
 
 
@@ -143,33 +136,52 @@ class User(Resource):
 class Login(Resource):
     def post(self):
         """API Login - basit login"""
-        try:
-            data = request.get_json()
-            if not data or not data.get('email') or not data.get('name'):
-                return {'message': 'Email and name required'}, 400
+        data = request.get_json()
+        if not data or not data.get('email') or not data.get('name'):
+            abort(400, message='Email and name required')
+        
+        user = UserModel.query.filter_by(email=data['email']).first()
+        
+        if user and user.check_name_as_password(data['name']):
+            return {
+                'message': 'Login successful',
+                'user': {
+                    'id': user.id,
+                    'name': user.name,
+                    'email': user.email
+                }
+            }, 200
+        else:
+            abort(401, message='Invalid credentials')
+
+
+# Fixed Signup class
+class Signup(Resource):
+    @marshal_with(userfields)
+    def post(self):
+        """Create new user via JSON - proper signup"""
+        data = request.get_json()
+        
+        if not data:
+            abort(400, message="JSON data required")
             
-            user = UserModel.query.filter_by(email=data['email']).first()
-            
-            if user and user.check_name_as_password(data['name']):
-                return {
-                    'message': 'Login successful',
-                    'user': {
-                        'id': user.id,
-                        'name': user.name,
-                        'email': user.email
-                    }
-                }, 200
-            else:
-                return {'message': 'Invalid credentials'}, 401
-                
-        except Exception as e:
-            print(f"Login error: {e}")
-            return {'message': 'Internal server error'}, 500
+        if not data.get("name") or not data.get("email"):
+            abort(400, message="Name and email are required")
+        
+        # Create new user
+        user = UserModel(email=data["email"])
+        user.set_name_as_password(data["name"])
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        return user, 201
+
 
 api.add_resource(Users, "/api/users/")
 api.add_resource(User, "/api/users/<int:id>")
 api.add_resource(Login, "/api/login")
-
+api.add_resource(Signup, "/api/signup")
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -185,22 +197,17 @@ def home():
             flash("Please fill in all fields.")
             return redirect(url_for("unsuccess"))
         
-        try:
-            user = UserModel.query.filter_by(email=email).first()
-            print(f"🔍 DEBUG: User found: {user}")
-            
-            # Name'i password olarak kontrol et
-            if user and user.check_name_as_password(name):
-                print("✅ DEBUG: Login successful")
-                flash(f"Welcome {user.name}!")
-                return redirect(url_for("success"))
-            else:
-                print("❌ DEBUG: Invalid credentials")
-                flash("Invalid email or name. Please try again.")
-                return redirect(url_for("unsuccess"))
-        except Exception as e:
-            print(f"💥 DEBUG: Database error: {e}")
-            flash("Database error occurred.")
+        user = UserModel.query.filter_by(email=email).first()
+        print(f"🔍 DEBUG: User found: {user}")
+        
+        # Name'i password olarak kontrol et
+        if user and user.check_name_as_password(name):
+            print("✅ DEBUG: Login successful")
+            flash(f"Welcome {user.name}!")
+            return redirect(url_for("success"))
+        else:
+            print("❌ DEBUG: Invalid credentials")
+            flash("Invalid email or name. Please try again.")
             return redirect(url_for("unsuccess"))
 
     return render_template('index.html')
