@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-   <html lang="en">
+   <html lang="tr">
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
       <!--=============== REMIXICONS ===============-->
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
+      
+      <!--=============== FONT AWESOME ===============-->
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
       <!--=============== CSS ===============-->
       <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
-      <title>Register form - Bedimcode</title>
+      <title>Kayıt Ol - Kanban Board</title>
    </head>
    <body>
       <!-- Navigation Back to Homepage -->
@@ -26,8 +29,13 @@
          <div class="theme-toggle-container">
             <button onclick="toggleTheme()" 
                     class="theme-toggle"
-                    title="Toggle Dark/Light Mode">
-               <div class="theme-toggle__slider"></div>
+                    title="Karanlık/Aydınlık Mod">
+               <div class="toggle-track">
+                  <div class="toggle-thumb">
+                     <i class="fas fa-sun sun-icon"></i>
+                     <i class="fas fa-moon moon-icon"></i>
+                  </div>
+               </div>
             </button>
          </div>
       </div>
@@ -36,16 +44,16 @@
          <img src="{{ url_for('static', filename='img/login-bg.png') }}" alt="image" class="login__bg">
 
          <form action="" method="POST" class="login__form" novalidate>
-            <h1 class="login__title">Register</h1>
+            <h1 class="login__title">Kayıt Ol</h1>
 
             <div class="login__inputs">
                <div class="login__box">
-                  <input type="text" placeholder="Your Name" name="name" required class="login__input">
+                  <input type="text" placeholder="Adınız" name="name" required class="login__input">
                   <i class="ri-user-fill"></i>
                </div>
 
                <div class="login__box">
-                  <input type="email" placeholder="Email ID" name="email" required class="login__input">
+                  <input type="email" placeholder="E-posta Adresiniz" name="email" required class="login__input">
                   <i class="ri-mail-fill"></i>
                </div>
             </div>
@@ -53,16 +61,16 @@
             <div class="login__check">
                <div class="login__check-box">
                   <input type="checkbox" class="login__check-input" id="user-check" required>
-                  <label for="user-check" class="login__check-label">I agree to terms</label>
+                  <label for="user-check" class="login__check-label">Şartları kabul ediyorum</label>
                </div>
 
-               <a href="{{ url_for('signin') }}" class="login__forgot">Back to Login</a>
+               <a href="{{ url_for('signin') }}" class="login__forgot">Giriş Yap'a Dön</a>
             </div>
 
-            <button type="submit" class="login__button">Register</button>
+            <button type="submit" class="login__button">Kayıt Ol</button>
 
             <div class="login__register">
-               Already have an account? <a href="{{ url_for('signin') }}">Login</a>
+               Zaten hesabınız var mı? <a href="{{ url_for('signin') }}">Giriş Yapın</a>
             </div>
          </form>
       </div>
@@ -112,6 +120,105 @@
             border-color: rgba(255, 255, 255, 0.2);
          }
 
+         /* Modern Theme Toggle */
+         .theme-toggle-container {
+            position: relative;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+         }
+
+         .theme-toggle-container:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+         }
+
+         [data-theme="dark"] .theme-toggle-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
+         }
+
+         [data-theme="dark"] .theme-toggle-container:hover {
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.05);
+         }
+
+         .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            width: 60px;
+            height: 30px;
+            position: relative;
+            outline: none;
+         }
+
+         .toggle-track {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50px;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+         }
+
+         [data-theme="dark"] .toggle-track {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+         }
+
+         .toggle-thumb {
+            background: white;
+            border-radius: 50%;
+            height: 26px;
+            width: 26px;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+         }
+
+         [data-theme="dark"] .toggle-thumb {
+            transform: translateX(30px);
+            background: #2d3748;
+         }
+
+         .sun-icon, .moon-icon {
+            position: absolute;
+            font-size: 12px;
+            transition: all 0.3s ease;
+         }
+
+         .sun-icon {
+            color: #fbbf24;
+            opacity: 1;
+         }
+
+         .moon-icon {
+            color: #64748b;
+            opacity: 0;
+         }
+
+         [data-theme="dark"] .sun-icon {
+            opacity: 0;
+         }
+
+         [data-theme="dark"] .moon-icon {
+            opacity: 1;
+            color: #60a5fa;
+         }
+
          /* Responsive improvements */
          @media (max-width: 768px) {
             .back-to-home {
@@ -128,7 +235,7 @@
       <script>
          // Theme Management
          function initializeTheme() {
-            const savedTheme = localStorage.getItem('kanban-theme') || 'light';
+            const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
          }
 
@@ -137,13 +244,25 @@
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             
             document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('kanban-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
             
             // Add smooth transition
             document.body.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
             setTimeout(() => {
                document.body.style.transition = '';
             }, 400);
+            
+            // Add ripple effect to toggle
+            const toggle = document.querySelector('.theme-toggle');
+            if (toggle) {
+               const ripple = document.createElement('div');
+               ripple.classList.add('ripple');
+               toggle.appendChild(ripple);
+               
+               setTimeout(() => {
+                  ripple.remove();
+               }, 600);
+            }
          }
 
          // Initialize theme on page load
@@ -232,25 +351,25 @@
 
                // Validate name
                if (!nameInput.value.trim()) {
-                  showError(nameInput, 'Name is required');
+                  showError(nameInput, 'Ad alanı zorunludur');
                   hasErrors = true;
                } else if (nameInput.value.trim().length < 2) {
-                  showError(nameInput, 'Name must be at least 2 characters');
+                  showError(nameInput, 'Ad en az 2 karakter olmalıdır');
                   hasErrors = true;
                }
 
                // Validate email
                if (!emailInput.value.trim()) {
-                  showError(emailInput, 'Email is required');
+                  showError(emailInput, 'E-posta adresi zorunludur');
                   hasErrors = true;
                } else if (!validateEmail(emailInput.value)) {
-                  showError(emailInput, 'Please enter a valid email');
+                  showError(emailInput, 'Lütfen geçerli bir e-posta adresi girin');
                   hasErrors = true;
                }
 
                // Validate terms checkbox
                if (!termsCheckbox.checked) {
-                  showError(termsCheckbox, 'Please agree to terms');
+                  showError(termsCheckbox, 'Lütfen şartları kabul edin');
                   hasErrors = true;
                }
 
