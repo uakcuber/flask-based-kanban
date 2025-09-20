@@ -13,6 +13,14 @@
       <title>Register form - Bedimcode</title>
    </head>
    <body>
+      <!-- Navigation Back to Homepage -->
+      <div style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
+         <a href="{{ url_for('homepage') }}" class="back-to-home">
+            <i class="ri-arrow-left-line"></i>
+            Ana Sayfa
+         </a>
+      </div>
+
       <!-- Dark Mode Toggle - Fixed Position -->
       <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
          <div class="theme-toggle-container">
@@ -48,13 +56,13 @@
                   <label for="user-check" class="login__check-label">I agree to terms</label>
                </div>
 
-               <a href="{{ url_for('home') }}" class="login__forgot">Back to Login</a>
+               <a href="{{ url_for('signin') }}" class="login__forgot">Back to Login</a>
             </div>
 
             <button type="submit" class="login__button">Register</button>
 
             <div class="login__register">
-               Already have an account? <a href="{{ url_for('home') }}">Login</a>
+               Already have an account? <a href="{{ url_for('signin') }}">Login</a>
             </div>
          </form>
       </div>
@@ -68,6 +76,54 @@
             </script>
          {% endif %}
       {% endwith %}
+
+      <style>
+         /* Back to home button styling */
+         .back-to-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+         }
+
+         .back-to-home:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            color: white;
+         }
+
+         [data-theme="dark"] .back-to-home {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+         }
+
+         [data-theme="dark"] .back-to-home:hover {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+         }
+
+         /* Responsive improvements */
+         @media (max-width: 768px) {
+            .back-to-home {
+               font-size: 0.8rem;
+               padding: 0.5rem 1rem;
+            }
+            
+            .theme-toggle-container {
+               scale: 0.9;
+            }
+         }
+      </style>
 
       <script>
          // Theme Management

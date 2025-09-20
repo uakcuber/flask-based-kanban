@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board - Proje Yönetimi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Clean Modern Homepage */
+        .homepage-container {
+            min-height: 100vh;
+            background: #ffffff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Dark Theme */
+        [data-theme="dark"] .homepage-container {
+            background: #0f172a;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e40af;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        [data-theme="dark"] .logo {
+            color: #60a5fa;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #475569;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: #1e40af;
+            background: rgba(30, 64, 175, 0.1);
+            transform: translateY(-2px);
+        }
+
+        [data-theme="dark"] .nav-link {
+            color: #cbd5e1;
+        }
+
+        [data-theme="dark"] .nav-link:hover {
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            color: #1e293b;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        [data-theme="dark"] .hero h1 {
+            color: #f1f5f9;
+            background: linear-gradient(135deg, #60a5fa, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 3rem;
+            color: #64748b;
+            line-height: 1.7;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        [data-theme="dark"] .hero p {
+            color: #94a3b8;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-btn.primary {
+            background: #1e40af;
+            color: white;
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
+        }
+
+        .cta-btn.primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.4);
+        }
+
+        .cta-btn.secondary {
+            background: white;
+            color: #1e40af;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .cta-btn.secondary:hover {
+            background: #f8fafc;
+            border-color: #1e40af;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Features Section */
+        .features {
+            background: #f8fafc;
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        [data-theme="dark"] .features {
+            background: #1e293b;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 4rem;
+        }
+
+        [data-theme="dark"] .features h2 {
+            color: #f1f5f9;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+        }
+
+        /* Feature card hover - same as buttons */
+        .feature-card:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.4);
+            background: #f8fafc;
+            border-color: #1e40af;
+        }
+
+        [data-theme="dark"] .feature-card {
+            background: #334155;
+            border-color: #475569;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="dark"] .feature-card:hover {
+            border-color: #60a5fa;
+            background: #3f4e64;
+            box-shadow: 0 20px 40px rgba(96, 165, 250, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #1e40af;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .feature-icon {
+            color: #60a5fa;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        [data-theme="dark"] .feature-card h3 {
+            color: #f1f5f9;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        [data-theme="dark"] .feature-card p {
+            color: #94a3b8;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.75rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            font-size: 1.25rem;
+            color: #64748b;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.1);
+            transform: scale(1.1);
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            color: #94a3b8;
+        }
+
+        [data-theme="dark"] .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-content {
+                padding: 0 1rem;
+            }
+            
+            .hero {
+                padding: 4rem 1rem 2rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="homepage-container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <a href="{{ url_for('homepage') }}" class="logo">
+                    <i class="fas fa-layer-group"></i>
+                    Kanban Pro
+                </a>
+                
+                <div class="nav-links">
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <a href="#features" class="nav-link">Özellikler</a>
+                    <a href="{{ url_for('signin') }}" class="nav-link">Giriş Yap</a>
+                    <a href="{{ url_for('register') }}" class="nav-link primary">Kayıt Ol</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <main class="hero">
+            <h1>Proje Yönetiminizi Bir Üst Seviyeye Taşıyın</h1>
+            <p>Modern ve kullanıcı dostu Kanban Board ile ekibinizin verimliliğini artırın. Görevlerinizi organize edin, ilerlemenizi takip edin ve başarıya ulaşın.</p>
+            
+            <div class="cta-buttons">
+                <a href="{{ url_for('signin') }}" class="cta-btn primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Hemen Başla
+                </a>
+                <a href="#features" class="cta-btn secondary">
+                    <i class="fas fa-info-circle"></i>
+                    Daha Fazla Bilgi
+                </a>
+            </div>
+        </main>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <h2>Neden Kanban Pro?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3>Kolay Görev Yönetimi</h3>
+                    <p>Sürükle-bırak ile görevlerinizi kolayca organize edin. To Do, Doing ve Done listelerinizi effortless yönetin.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <h3>Karanlık/Aydınlık Tema</h3>
+                    <p>Gözlerinizi yormayan karanlık tema veya klasik aydınlık tema arasında istediğiniz zaman geçiş yapın.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Responsive Tasarım</h3>
+                    <p>Masaüstü, tablet ve mobil cihazlarda mükemmel çalışan responsive arayüz ile her yerden erişim.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <h3>Başarı Kutlamaları</h3>
+                    <p>Görevlerinizi tamamladığınızda havai fişek animasyonları ile başarınızı kutlayın ve motive olun.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Güvenli ve Hızlı</h3>
+                    <p>Verileriniz güvenli Flask backend ile korunur. Hızlı ve güvenilir performans garantisi.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>İlerleme Takibi</h3>
+                    <p>Projelerinizin ilerlemesini takip edin ve ekibinizin verimliliğini sürekli artırın.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // Check for saved theme preference or default to 'light'
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+            if (theme === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+            }
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -30,7 +30,7 @@ def login_required(f):
         if 'user_id' not in session:
             if request.endpoint.startswith('api.'):
                 abort(401, message="Authentication required")
-            return redirect(url_for('signin'))
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -555,8 +555,8 @@ def homepage():
     """Modern homepage with features and navigation"""
     return render_template("homepage.html")
 
-@app.route("/signin", methods=["GET", "POST"])
-def signin():
+@app.route("/login", methods=["GET", "POST"])
+def login():
     if request.method == "POST":
         print("🔍 DEBUG: Form submitted")
         email = request.form.get("email")
