@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from functools import wraps
 import os
 import pytest
+import subprocess
 
 app = Flask(__name__)
 app.secret_key = 'benimgizlianahtarim123'  # Flash mesajları için - istediğin herhangi bir text
@@ -701,7 +702,37 @@ with app.app_context():
     db.create_all()
     print("✅ Database tables created successfully!")
 
+def start_nginx_if_available():
+    """Simple nginx starter"""
+    nginx_path = os.path.join(os.getcwd(), "nginx", "nginx.exe")
+    if os.path.exists(nginx_path):
+        try:
+            # Check if already running
+            result = subprocess.run(['tasklist', '/FI', 'IMAGENAME eq nginx.exe'], 
+                                  capture_output=True, text=True)
+            if 'nginx.exe' not in result.stdout:
+                print("🚀 Starting Nginx HTTPS proxy...")
+                subprocess.Popen([nginx_path], cwd=os.path.join(os.getcwd(), "nginx"))
+                print("✅ Nginx started! Visit: https://localhost")
+                return True
+            else:
+                print("✅ Nginx already running!")
+                return True
+        except:
+            pass
+    return False
+
 if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5001)
+    # Try to start nginx first
+    nginx_started = start_nginx_if_available()
+    
+    if nginx_started:
+        print("🔄 Running Flask behind Nginx proxy")
+        print("🌐 Flask: http://127.0.0.1:5000")
+        print("🔒 HTTPS: https://localhost")
+        app.run(debug=True, host='127.0.0.1', port=5000)
+    else:
+        print("🔄 Running Flask directly")
+        app.run(debug=True, host='127.0.0.1', port=5001)
 
 
