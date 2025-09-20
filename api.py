@@ -722,37 +722,6 @@ def start_nginx_if_available():
             pass
     return False
 
-def stop_nginx():
-    """Stop Nginx server with taskkill"""
-    try:
-        # Graceful shutdown first
-        nginx_path = os.path.join(os.getcwd(), "nginx", "nginx.exe")
-        if os.path.exists(nginx_path):
-            subprocess.run([nginx_path, '-s', 'quit'], 
-                         cwd=os.path.join(os.getcwd(), "nginx"),
-                         capture_output=True, timeout=3)
-        
-        # Force kill with taskkill
-        result = subprocess.run(['taskkill', '/F', '/IM', 'nginx.exe'], 
-                              capture_output=True, text=True)
-        if 'SUCCESS' in result.stdout:
-            print("🛑 Nginx stopped successfully!")
-        else:
-            print("ℹ️  Nginx was not running")
-            
-    except Exception as e:
-        print(f"⚠️  Error stopping Nginx: {e}")
-
-def cleanup_on_exit():
-    """Cleanup function called on exit"""
-    print("\n🧹 Cleaning up...")
-    stop_nginx()
-    print("👋 Goodbye!")
-
-# Register cleanup function
-import atexit
-atexit.register(cleanup_on_exit)
-
 if __name__ == '__main__':
     # Try to start nginx first
     nginx_started = start_nginx_if_available()

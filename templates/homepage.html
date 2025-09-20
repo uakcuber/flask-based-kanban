@@ -185,7 +185,7 @@
             font-size: 3.5rem;
             font-weight: 900;
             margin-bottom: 1.5rem;
-            line-height: 1.1;
+            line-height: 1.3;
             color: #1e293b;
             background: linear-gradient(135deg, #1e40af, #3b82f6);
             -webkit-background-clip: text;
@@ -591,7 +591,7 @@
             }
         }
 
-        /* Enhanced Termynal Styling - Inverted Themes */
+        /* Enhanced Termynal Styling - Dynamic Size with Fade-in */
         #termynal {
             background: #252a33;
             border: 1px solid #374151;
@@ -603,9 +603,12 @@
             font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
             position: relative;
             overflow: hidden;
-            min-height: 450px;
-            opacity: 1 !important;
+            min-height: 120px; /* Start small */
+            height: auto; /* Dynamic height */
+            transition: min-height 0.3s ease-out;
         }
+
+
 
         [data-theme="dark"] #termynal {
             background: #ddd;
@@ -613,19 +616,26 @@
             box-shadow: 0 8px 32px rgba(215, 109, 119, 0.3);
         }
 
+        /* Dark theme */
+        [data-theme="dark"] #termynal {
+            box-shadow: 0 8px 32px rgba(215, 109, 119, 0.4);
+        }
+
         /* Always visible */
         #termynal {
             opacity: 1 !important;
         }
 
-        /* Override termynal default styles - Inverted */
+        /* Override termynal default styles - Dynamic */
         #termynal[data-termynal] {
             background: #252a33 !important;
             color: #eee !important;
             font-size: 14px !important;
-            padding: 60px 35px 30px !important;
+            padding: 60px 35px 20px !important; /* Reduced bottom padding */
             border-radius: 8px !important;
             line-height: 1.8 !important;
+            min-height: 120px !important; /* Start small */
+            height: auto !important; /* Allow dynamic growth */
         }
 
         [data-theme="dark"] #termynal[data-termynal] {
@@ -751,13 +761,40 @@
             font-style: italic !important;
         }
 
-        /* Terminal always has activity animation - Inverted */
-        #termynal {
+        /* Terminal activity animation only after loading */
+        #termynal.terminal-active {
             animation: terminal-activity 3s ease-in-out infinite;
         }
 
-        [data-theme="dark"] #termynal {
+        [data-theme="dark"] #termynal.terminal-active {
             animation: terminal-activity-light 3s ease-in-out infinite;
+        }
+
+        /* Terminal expansion animation */
+        #termynal.expanding {
+            transform: scaleY(1.02);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        [data-theme="dark"] #termynal.expanding {
+            box-shadow: 0 12px 40px rgba(215, 109, 119, 0.5);
+        }
+
+        /* Smooth line addition animation */
+        #termynal [data-ty] {
+            opacity: 0;
+            animation: line-appear 0.5s ease-out forwards;
+        }
+
+        @keyframes line-appear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* When terminal becomes visible, add floating effect */
@@ -789,7 +826,7 @@
             }
             
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 2rem;
             }
             
             .cta-buttons {
@@ -812,11 +849,11 @@
             #termynal {
                 font-size: 12px !important;
                 max-width: 98% !important;
-                min-height: 350px !important;
+                min-height: 100px !important; /* Smaller start on mobile */
             }
 
             #termynal[data-termynal] {
-                padding: 50px 25px 25px !important;
+                padding: 50px 25px 15px !important; /* Less padding on mobile */
             }
         }
     </style>
@@ -1050,11 +1087,21 @@
                 this.container.style.minHeight = containerStyle.height !== '0px' ? containerStyle.height : undefined;
                 this.container.setAttribute('data-termynal', '');
                 this.container.innerHTML = '';
+                
+
+                
                 this.start();
             }
 
             async start() {
                 await this._wait(this.startDelay);
+                
+                // Add activity animation class after fade-in
+                this.container.classList.add('terminal-active');
+                
+                // Dynamic terminal expansion
+                this._expandTerminal();
+                
                 for (let line of this.lines) {
                     const type = line.getAttribute(this.pfx);
                     const delay = line.getAttribute(`${this.pfx}-delay`) || this.lineDelay;
@@ -1071,7 +1118,27 @@
                         await this._wait(delay);
                     }
                     line.removeAttribute(`${this.pfx}-cursor`);
+                    
+                    // Expand terminal as content grows
+                    this._expandTerminal();
                 }
+            }
+
+            _expandTerminal() {
+                // Calculate required height based on content
+                const lineCount = this.container.children.length;
+                const baseHeight = 120; // Initial height
+                const lineHeight = 29; // Approximate line height
+                const newMinHeight = Math.max(baseHeight, baseHeight + (lineCount * lineHeight));
+                
+                // Smooth expansion
+                this.container.style.minHeight = `${newMinHeight}px`;
+                
+                // Add expansion animation class
+                this.container.classList.add('expanding');
+                setTimeout(() => {
+                    this.container.classList.remove('expanding');
+                }, 300);
             }
 
             _colorize(line) {
@@ -1201,18 +1268,34 @@
             }
         }
 
-        // Simple terminal initialization
+        // Smart terminal initialization with fade-in
         document.addEventListener('DOMContentLoaded', function() {
             const terminal = document.getElementById('termynal');
+            let terminalStarted = false;
             
-            // Start terminal animation immediately
-            setTimeout(() => {
-                new Termynal('#termynal', {
-                    startDelay: 1200,
-                    typeDelay: 60,
-                    lineDelay: 1000
+            // Intersection Observer to start terminal when visible
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !terminalStarted) {
+                        terminalStarted = true;
+                        
+                        // Start terminal with fade-in
+                        setTimeout(() => {
+                            new Termynal('#termynal', {
+                                startDelay: 800,
+                                typeDelay: 50,
+                                lineDelay: 900
+                            });
+                        }, 300);
+                    }
                 });
-            }, 500);
+            }, {
+                threshold: 0.3 // Start when 30% visible
+            });
+            
+            if (terminal) {
+                observer.observe(terminal);
+            }
         });
     </script>
 </body>
