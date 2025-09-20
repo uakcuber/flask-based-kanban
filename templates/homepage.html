@@ -276,29 +276,150 @@
             color: #94a3b8;
         }
 
-        /* Theme Toggle */
+        /* Theme Toggle - Login Style */
+        .theme-toggle-container {
+            position: relative;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .theme-toggle-container:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] .theme-toggle-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] .theme-toggle-container:hover {
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.05);
+        }
+
         .theme-toggle {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 0.75rem;
-            border-radius: 50%;
+            padding: 0;
+            border-radius: 50px;
             transition: all 0.3s ease;
-            font-size: 1.25rem;
+            width: 60px;
+            height: 30px;
+            position: relative;
+            outline: none;
+        }
+
+        .toggle-track {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50px;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] .toggle-track {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        }
+
+        .toggle-thumb {
+            background: white;
+            border-radius: 50%;
+            height: 26px;
+            width: 26px;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] .toggle-thumb {
+            transform: translateX(30px);
+            background: #2d3748;
+        }
+
+        .sun-icon, .moon-icon {
+            position: absolute;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .sun-icon {
+            color: #fbbf24;
+            opacity: 1;
+        }
+
+        .moon-icon {
             color: #64748b;
+            opacity: 0;
         }
 
-        .theme-toggle:hover {
-            background: rgba(0, 0, 0, 0.1);
-            transform: scale(1.1);
+        [data-theme="dark"] .sun-icon {
+            opacity: 0;
         }
 
-        [data-theme="dark"] .theme-toggle {
-            color: #94a3b8;
+        [data-theme="dark"] .moon-icon {
+            opacity: 1;
+            color: #60a5fa;
         }
 
-        [data-theme="dark"] .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
+        /* CTA Style Button */
+        .nav-link.cta-style {
+            background: #1e40af;
+            color: white !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-link.cta-style:hover {
+            background: #1d4ed8 !important;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.4);
+        }
+
+        [data-theme="dark"] .nav-link.cta-style {
+            background: #60a5fa;
+            color: #0f172a !important;
+        }
+
+        [data-theme="dark"] .nav-link.cta-style:hover {
+            background: #3b82f6 !important;
+        }
+
+        /* Ripple Effect */
+        .ripple {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: translate(-50%, -50%);
+            animation: ripple-animation 0.6s ease-out;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                width: 60px;
+                height: 60px;
+                opacity: 0;
+            }
         }
 
         /* Responsive */
@@ -337,12 +458,21 @@
                 </a>
                 
                 <div class="nav-links">
-                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-                        <i class="fas fa-moon"></i>
-                    </button>
+                    <div class="theme-toggle-container">
+                        <button onclick="toggleTheme()" 
+                                class="theme-toggle"
+                                title="Karanlık/Aydınlık Mod">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb">
+                                    <i class="fas fa-sun sun-icon"></i>
+                                    <i class="fas fa-moon moon-icon"></i>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
                     <a href="#features" class="nav-link">Özellikler</a>
                     <a href="{{ url_for('signin') }}" class="nav-link">Giriş Yap</a>
-                    <a href="{{ url_for('register') }}" class="nav-link primary">Kayıt Ol</a>
+                    <a href="{{ url_for('signin') }}" class="nav-link cta-style">Kayıt Ol</a>
                 </div>
             </div>
         </nav>
@@ -420,32 +550,38 @@
     </div>
 
     <script>
-        // Theme Toggle Functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const html = document.documentElement;
-        const themeIcon = themeToggle.querySelector('i');
-        
-        // Check for saved theme preference or default to 'light'
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        html.setAttribute('data-theme', savedTheme);
-        updateThemeIcon(savedTheme);
-        
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        });
-
-        function updateThemeIcon(theme) {
-            if (theme === 'dark') {
-                themeIcon.className = 'fas fa-sun';
-            } else {
-                themeIcon.className = 'fas fa-moon';
-            }
+        // Theme Management - Login Style
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
         }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Add smooth transition
+            document.body.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            setTimeout(() => {
+                document.body.style.transition = '';
+            }, 400);
+            
+            // Add ripple effect to toggle
+            const toggle = document.querySelector('.theme-toggle');
+            const ripple = document.createElement('div');
+            ripple.classList.add('ripple');
+            toggle.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        }
+
+        // Initialize theme on page load
+        initializeTheme();
 
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
