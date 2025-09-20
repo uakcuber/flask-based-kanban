@@ -6,6 +6,89 @@
     <title>Kanban Board - Proje Yönetimi</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Termynal CSS (embedded for reliability) -->
+    <style id="termynal-css">
+        :root {
+            --color-bg: #252a33;
+            --color-text: #eee;
+            --color-text-subtle: #a2a2a2;
+        }
+
+        [data-termynal] {
+            width: 100%;
+            max-width: 100%;
+            background: var(--color-bg);
+            color: var(--color-text);
+            font-size: 18px;
+            font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
+            border-radius: 4px;
+            padding: 75px 45px 35px;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        [data-termynal]:before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #d9515d;
+            box-shadow: 25px 0 0 #f4c025, 50px 0 0 #3ec930;
+        }
+
+        [data-termynal]:after {
+            content: 'bash';
+            position: absolute;
+            color: var(--color-text-subtle);
+            top: 5px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        [data-ty] {
+            display: block;
+            line-height: 2;
+        }
+
+        [data-ty]:before {
+            content: '';
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        [data-ty="input"]:before,
+        [data-ty-prompt]:before {
+            margin-right: 0.75em;
+            color: var(--color-text-subtle);
+        }
+
+        [data-ty="input"]:before {
+            content: '$';
+        }
+
+        [data-ty][data-ty-prompt]:before {
+            content: attr(data-ty-prompt);
+        }
+
+        [data-ty-cursor]:after {
+            content: attr(data-ty-cursor);
+            font-family: monospace;
+            margin-left: 0.5em;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
     <style>
         /* Clean Modern Homepage */
         .homepage-container {
@@ -422,6 +505,279 @@
             }
         }
 
+        /* Terminal Demo Section */
+        .terminal-demo {
+            background: #ffffff;
+            padding: 6rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .terminal-demo {
+            background: #0f172a;
+        }
+
+        .terminal-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .terminal-demo h2 {
+            color: #1e293b;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .terminal-demo p {
+            color: #64748b;
+            font-size: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        [data-theme="dark"] .terminal-demo h2 {
+            color: #f1f5f9;
+        }
+
+        [data-theme="dark"] .terminal-demo p {
+            color: #94a3b8;
+        }
+
+        /* Terminal Always Visible */
+        #termynal {
+            opacity: 1 !important;
+            animation: terminal-float 4s ease-in-out infinite;
+        }
+
+        @keyframes terminal-float {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.01);
+            }
+        }
+
+        /* Dark terminal activity (for light mode) */
+        @keyframes terminal-activity {
+            0%, 100% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            }
+            25% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(59, 130, 246, 0.15);
+            }
+            50% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 30px rgba(34, 197, 94, 0.2);
+            }
+            75% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(168, 85, 247, 0.15);
+            }
+        }
+
+        /* Light terminal activity (for dark mode) */
+        @keyframes terminal-activity-light {
+            0%, 100% {
+                box-shadow: 0 8px 32px rgba(215, 109, 119, 0.3);
+            }
+            25% {
+                box-shadow: 0 8px 32px rgba(215, 109, 119, 0.3), 0 0 20px rgba(58, 28, 113, 0.1);
+            }
+            50% {
+                box-shadow: 0 8px 32px rgba(215, 109, 119, 0.3), 0 0 30px rgba(255, 175, 123, 0.2);
+            }
+            75% {
+                box-shadow: 0 8px 32px rgba(215, 109, 119, 0.3), 0 0 20px rgba(215, 109, 119, 0.15);
+            }
+        }
+
+        /* Enhanced Termynal Styling - Inverted Themes */
+        #termynal {
+            background: #252a33;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            max-width: 1000px;
+            width: 95%;
+            margin: 0 auto;
+            font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
+            position: relative;
+            overflow: hidden;
+            min-height: 450px;
+            opacity: 1 !important;
+        }
+
+        [data-theme="dark"] #termynal {
+            background: #ddd;
+            border: 1px solid #d76d77;
+            box-shadow: 0 8px 32px rgba(215, 109, 119, 0.3);
+        }
+
+        /* Always visible */
+        #termynal {
+            opacity: 1 !important;
+        }
+
+        /* Override termynal default styles - Inverted */
+        #termynal[data-termynal] {
+            background: #252a33 !important;
+            color: #eee !important;
+            font-size: 14px !important;
+            padding: 60px 35px 30px !important;
+            border-radius: 8px !important;
+            line-height: 1.8 !important;
+        }
+
+        [data-theme="dark"] #termynal[data-termynal] {
+            background: #ddd !important;
+            color: #1a1e24 !important;
+        }
+
+        /* Terminal window controls - Inverted */
+        #termynal[data-termynal]:before {
+            background: #d9515d !important;
+            box-shadow: 25px 0 0 #f4c025, 50px 0 0 #3ec930 !important;
+            top: 15px !important;
+            left: 15px !important;
+            width: 15px !important;
+            height: 15px !important;
+        }
+
+        [data-theme="dark"] #termynal[data-termynal]:before {
+            background: #ef4444 !important;
+            box-shadow: 20px 0 0 #f59e0b, 40px 0 0 #10b981 !important;
+        }
+
+        #termynal[data-termynal]:after {
+            content: 'pytest-runner' !important;
+            color: #a2a2a2 !important;
+            font-size: 12px !important;
+            top: 12px !important;
+        }
+
+        [data-theme="dark"] #termynal[data-termynal]:after {
+            color: #1a1e24 !important;
+        }
+
+        /* Terminal lines styling */
+        #termynal [data-ty] {
+            line-height: 1.6 !important;
+            margin: 0 !important;
+            padding: 1px 0 !important;
+        }
+
+        /* Input styling - inverted theme aware */
+        #termynal [data-ty="input"]:before {
+            content: '$ ' !important;
+            color: #a2a2a2 !important;
+            font-weight: bold !important;
+        }
+
+        [data-theme="dark"] #termynal [data-ty="input"]:before {
+            color: #D76D77 !important;
+        }
+
+        /* Color specific outputs - Enhanced */
+        #termynal [data-ty*="PASSED"] {
+            color: #10b981 !important;
+            font-weight: bold !important;
+        }
+
+        #termynal [data-ty*="test_"] {
+            color: #60a5fa !important;
+        }
+
+        #termynal [data-ty*="==="] {
+            color: #f59e0b !important;
+            font-weight: bold !important;
+        }
+
+        #termynal [data-ty*="platform"] {
+            color: #8b5cf6 !important;
+        }
+
+        #termynal [data-ty*="rootdir"] {
+            color: #64748b !important;
+        }
+
+        #termynal [data-ty*="collected"] {
+            color: #06b6d4 !important;
+            font-weight: bold !important;
+        }
+
+        #termynal [data-ty*="100%"] {
+            color: #10b981 !important;
+            font-weight: bold !important;
+        }
+
+        #termynal [data-ty*="98%"] {
+            color: #10b981 !important;
+            font-weight: bold !important;
+        }
+
+        #termynal [data-ty*="96%"] {
+            color: #eab308 !important;
+            font-weight: bold !important;
+        }
+
+        #termynal [data-ty*="Running on"] {
+            color: #06b6d4 !important;
+        }
+
+        #termynal [data-ty*="Environment"] {
+            color: #8b5cf6 !important;
+        }
+
+        #termynal [data-ty*="Debug mode"] {
+            color: #f59e0b !important;
+        }
+
+        #termynal [data-ty*="Name"] {
+            color: #e2e8f0 !important;
+            font-weight: bold !important;
+        }
+
+        #termynal [data-ty*="Stmts"] {
+            color: #94a3b8 !important;
+        }
+
+        #termynal [data-ty*="TOTAL"] {
+            color: #f1f5f9 !important;
+            font-weight: bold !important;
+        }
+
+        #termynal [data-ty*="Press CTRL+C"] {
+            color: #ef4444 !important;
+            font-style: italic !important;
+        }
+
+        /* Terminal always has activity animation - Inverted */
+        #termynal {
+            animation: terminal-activity 3s ease-in-out infinite;
+        }
+
+        [data-theme="dark"] #termynal {
+            animation: terminal-activity-light 3s ease-in-out infinite;
+        }
+
+        /* When terminal becomes visible, add floating effect */
+        #termynal.terminal-visible {
+            animation: terminal-activity 3s ease-in-out infinite, terminal-float 4s ease-in-out infinite;
+        }
+
+        [data-theme="dark"] #termynal.terminal-visible {
+            animation: terminal-activity-light 3s ease-in-out infinite, terminal-float 4s ease-in-out infinite;
+        }
+
+        /* Typing activity indicator */
+        #termynal.typing-active {
+            animation-duration: 0.8s !important;
+        }
+
+        [data-theme="dark"] #termynal.typing-active {
+            animation-duration: 0.8s !important;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .nav-content {
@@ -443,6 +799,24 @@
             
             .features-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .terminal-demo {
+                padding: 4rem 1rem;
+            }
+
+            .terminal-demo h2 {
+                font-size: 2rem;
+            }
+
+            #termynal {
+                font-size: 12px !important;
+                max-width: 98% !important;
+                min-height: 350px !important;
+            }
+
+            #termynal[data-termynal] {
+                padding: 50px 25px 25px !important;
             }
         }
     </style>
@@ -547,6 +921,57 @@
                 </div>
             </div>
         </section>
+
+        <!-- Terminal Demo Section -->
+        <section class="terminal-demo">
+            <div class="terminal-container">
+                <h2>Canlı Test Demonstrasyonu</h2>
+                <p>Flask API'mızın test süreçlerini canlı olarak izleyin</p>
+                
+                <div id="termynal" data-termynal>
+                    <span data-ty="input">cd flask-kanban-api</span>
+                    <span data-ty="input">python -m pytest tests/ -v</span>
+                    <span data-ty>========================= test session starts =========================</span>
+                    <span data-ty>platform win32 -- Python 3.11.0, pytest-7.4.0, pluggy-1.0.0</span>
+                    <span data-ty>rootdir: C:\flask-kanban-api</span>
+                    <span data-ty>collected 12 items</span>
+                    <span data-ty></span>
+                    <span data-ty>tests/test_auth.py::test_user_registration PASSED</span>
+                    <span data-ty>tests/test_auth.py::test_user_login PASSED</span>
+                    <span data-ty>tests/test_auth.py::test_invalid_credentials PASSED</span>
+                    <span data-ty>tests/test_api.py::test_create_task PASSED</span>
+                    <span data-ty>tests/test_api.py::test_get_tasks PASSED</span>
+                    <span data-ty>tests/test_api.py::test_update_task_status PASSED</span>
+                    <span data-ty>tests/test_api.py::test_delete_task PASSED</span>
+                    <span data-ty>tests/test_database.py::test_db_connection PASSED</span>
+                    <span data-ty>tests/test_database.py::test_user_model PASSED</span>
+                    <span data-ty>tests/test_database.py::test_task_model PASSED</span>
+                    <span data-ty>tests/test_security.py::test_jwt_token_validation PASSED</span>
+                    <span data-ty>tests/test_security.py::test_password_hashing PASSED</span>
+                    <span data-ty></span>
+                    <span data-ty>========================= 12 passed in 2.47s =========================</span>
+                    <span data-ty></span>
+                    <span data-ty="input">python -m coverage report</span>
+                    <span data-ty>Name                     Stmts   Miss  Cover</span>
+                    <span data-ty>-----------------------------------------</span>
+                    <span data-ty>api.py                      84      2    98%</span>
+                    <span data-ty>models/user.py              32      0   100%</span>
+                    <span data-ty>models/task.py              28      1    96%</span>
+                    <span data-ty>utils/auth.py               15      0   100%</span>
+                    <span data-ty>utils/database.py           22      0   100%</span>
+                    <span data-ty>-----------------------------------------</span>
+                    <span data-ty>TOTAL                      181      3    98%</span>
+                    <span data-ty></span>
+                    <span data-ty="input">flask run --host=0.0.0.0 --port=5000</span>
+                    <span data-ty> * Environment: production</span>
+                    <span data-ty> * Debug mode: off</span>
+                    <span data-ty> * Running on all addresses (0.0.0.0)</span>
+                    <span data-ty> * Running on http://127.0.0.1:5000</span>
+                    <span data-ty> * Running on http://192.168.1.100:5000</span>
+                    <span data-ty>Press CTRL+C to quit</span>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script>
@@ -595,6 +1020,199 @@
                     });
                 }
             });
+        });
+    </script>
+
+    <!-- Termynal JavaScript (embedded for reliability) -->
+    <script>
+        'use strict';
+
+        /** Generate a terminal widget. */
+        class Termynal {
+            constructor(container = '#termynal', options = {}) {
+                this.container = (typeof container === 'string') ? document.querySelector(container) : container;
+                this.pfx = `data-${options.prefix || 'ty'}`;
+                this.startDelay = options.startDelay || 600;
+                this.typeDelay = options.typeDelay || 90;
+                this.lineDelay = options.lineDelay || 1500;
+                this.progressLength = options.progressLength || 40;
+                this.progressChar = options.progressChar || '█';
+                this.progressPercent = options.progressPercent || 100;
+                this.cursor = options.cursor || '▋';
+                this.lineData = this.lineDataToElements(options.lineData || []);
+                if (!options.noInit) this.init()
+            }
+
+            init() {
+                this.lines = [...this.container.querySelectorAll(`[${this.pfx}]`)].concat(this.lineData);
+                const containerStyle = getComputedStyle(this.container);
+                this.container.style.width = containerStyle.width !== '0px' ? containerStyle.width : undefined;
+                this.container.style.minHeight = containerStyle.height !== '0px' ? containerStyle.height : undefined;
+                this.container.setAttribute('data-termynal', '');
+                this.container.innerHTML = '';
+                this.start();
+            }
+
+            async start() {
+                await this._wait(this.startDelay);
+                for (let line of this.lines) {
+                    const type = line.getAttribute(this.pfx);
+                    const delay = line.getAttribute(`${this.pfx}-delay`) || this.lineDelay;
+                    if (type == 'input') {
+                        line.setAttribute(`${this.pfx}-cursor`, this.cursor);
+                        await this.type(line);
+                        await this._wait(delay);
+                    } else if (type == 'progress') {
+                        await this.progress(line);
+                        await this._wait(delay);
+                    } else {
+                        this.container.appendChild(line);
+                        this._colorize(line);
+                        await this._wait(delay);
+                    }
+                    line.removeAttribute(`${this.pfx}-cursor`);
+                }
+            }
+
+            _colorize(line) {
+                const text = line.textContent;
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                
+                // PASSED tests - inverted colors
+                if (text.includes('PASSED')) {
+                    line.style.color = isDark ? '#3ec930' : '#10b981';
+                    line.style.fontWeight = 'bold';
+                }
+                // Test names - inverted colors
+                else if (text.includes('test_')) {
+                    line.style.color = isDark ? '#3a1c71' : '#60a5fa';
+                }
+                // Headers with === - inverted colors
+                else if (text.includes('===')) {
+                    line.style.color = isDark ? '#ffaf7b' : '#f59e0b';
+                    line.style.fontWeight = 'bold';
+                }
+                // Platform info - inverted colors
+                else if (text.includes('platform') || text.includes('rootdir')) {
+                    line.style.color = isDark ? '#d76d77' : '#8b5cf6';
+                }
+                // Collected items - inverted colors
+                else if (text.includes('collected')) {
+                    line.style.color = isDark ? '#ffaf7b' : '#06b6d4';
+                    line.style.fontWeight = 'bold';
+                }
+                // Coverage percentages - inverted colors
+                else if (text.includes('100%')) {
+                    line.style.color = isDark ? '#3ec930' : '#10b981';
+                    line.style.fontWeight = 'bold';
+                }
+                else if (text.includes('98%')) {
+                    line.style.color = isDark ? '#3ec930' : '#10b981';
+                    line.style.fontWeight = 'bold';
+                }
+                else if (text.includes('96%')) {
+                    line.style.color = isDark ? '#f4c025' : '#eab308';
+                    line.style.fontWeight = 'bold';
+                }
+                // Flask server info - inverted colors
+                else if (text.includes('Running on') || text.includes('Environment')) {
+                    line.style.color = isDark ? '#d76d77' : '#06b6d4';
+                }
+                // Debug mode - inverted colors
+                else if (text.includes('Debug mode')) {
+                    line.style.color = isDark ? '#ffaf7b' : '#f59e0b';
+                }
+                // Coverage table headers - inverted colors
+                else if (text.includes('Name') && text.includes('Stmts')) {
+                    line.style.color = isDark ? '#1a1e24' : '#e2e8f0';
+                    line.style.fontWeight = 'bold';
+                }
+                // TOTAL row - inverted colors
+                else if (text.includes('TOTAL')) {
+                    line.style.color = isDark ? '#1a1e24' : '#f1f5f9';
+                    line.style.fontWeight = 'bold';
+                }
+                // Control message - red (both themes)
+                else if (text.includes('Press CTRL+C')) {
+                    line.style.color = isDark ? '#d9515d' : '#ef4444';
+                    line.style.fontStyle = 'italic';
+                }
+            }
+
+            async type(line) {
+                const chars = [...line.textContent];
+                const delay = line.getAttribute(`${this.pfx}-typeDelay`) || this.typeDelay;
+                line.textContent = '';
+                this.container.appendChild(line);
+                
+                // Add typing indicator
+                this.container.classList.add('typing-active');
+                
+                for (let char of chars) {
+                    await this._wait(delay);
+                    line.textContent += char;
+                }
+                
+                // Remove typing indicator and apply colors
+                this.container.classList.remove('typing-active');
+                this._colorize(line);
+            }
+
+            async progress(line) {
+                const progressLength = line.getAttribute(`${this.pfx}-progressLength`) || this.progressLength;
+                const progressChar = line.getAttribute(`${this.pfx}-progressChar`) || this.progressChar;
+                const chars = progressChar.repeat(progressLength);
+                const progressPercent = line.getAttribute(`${this.pfx}-progressPercent`) || this.progressPercent;
+                line.textContent = '';
+                this.container.appendChild(line);
+                for (let i = 1; i < chars.length + 1; i++) {
+                    await this._wait(this.typeDelay);
+                    const percent = Math.round(i / chars.length * 100);
+                    line.textContent = `${chars.slice(0, i)} ${percent}%`;
+                    if (percent > progressPercent) {
+                        break;
+                    }
+                }
+            }
+
+            _wait(time) {
+                return new Promise(resolve => setTimeout(resolve, time));
+            }
+
+            lineDataToElements(lineData) {
+                return lineData.map(line => {
+                    let div = document.createElement('div');
+                    div.innerHTML = `<span ${this._attributes(line)}>${line.value || ''}</span>`;
+                    return div.firstElementChild;
+                });
+            }
+
+            _attributes(line) {
+                let attrs = '';
+                for (let prop in line) {
+                    attrs += this.pfx;
+                    if (prop === 'type') {
+                        attrs += `="${line[prop]}" `
+                    } else if (prop !== 'value') {
+                        attrs += `-${prop}="${line[prop]}" `
+                    }
+                }
+                return attrs;
+            }
+        }
+
+        // Simple terminal initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const terminal = document.getElementById('termynal');
+            
+            // Start terminal animation immediately
+            setTimeout(() => {
+                new Termynal('#termynal', {
+                    startDelay: 1200,
+                    typeDelay: 60,
+                    lineDelay: 1000
+                });
+            }, 500);
         });
     </script>
 </body>
