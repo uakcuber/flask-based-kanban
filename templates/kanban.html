@@ -14,6 +14,9 @@
     <!-- Remix Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.css">
     
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <!-- SortableJS for Drag & Drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     
@@ -453,124 +456,103 @@
             display: none !important;
         }
 
-        /*=============== DARK MODE TOGGLE SWITCH ===============*/
+        /*=============== MODERN THEME TOGGLE ===============*/
         .theme-toggle {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            width: 64px;
-            height: 32px;
-            background: linear-gradient(145deg, #e0f2fe, #b3e5fc);
-            border-radius: 32px;
+            background: none;
+            border: none;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 
-                inset 2px 2px 6px rgba(0, 0, 0, 0.1),
-                inset -2px -2px 6px rgba(255, 255, 255, 0.8),
-                0 4px 12px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            user-select: none;
+            padding: 0;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            width: 60px;
+            height: 30px;
+            position: relative;
+            outline: none;
         }
 
-        .theme-toggle:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                inset 2px 2px 8px rgba(0, 0, 0, 0.12),
-                inset -2px -2px 8px rgba(255, 255, 255, 0.9),
-                0 8px 20px rgba(0, 0, 0, 0.2);
+        .toggle-track {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50px;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .theme-toggle:active {
-            transform: translateY(0px);
-            box-shadow: 
-                inset 3px 3px 8px rgba(0, 0, 0, 0.15),
-                inset -1px -1px 4px rgba(255, 255, 255, 0.7),
-                0 2px 8px rgba(0, 0, 0, 0.1);
+        [data-theme="dark"] .toggle-track {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
         }
 
-        .theme-toggle__slider {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 26px;
-            height: 26px;
-            background: linear-gradient(145deg, #ffffff, #f0f9ff);
+        .toggle-thumb {
+            background: white;
             border-radius: 50%;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 
-                2px 2px 6px rgba(0, 0, 0, 0.15),
-                -1px -1px 4px rgba(255, 255, 255, 0.9),
-                inset 1px 1px 2px rgba(255, 255, 255, 0.8),
-                inset -1px -1px 2px rgba(0, 0, 0, 0.05);
+            height: 26px;
+            width: 26px;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .theme-toggle__slider::before {
-            content: '☀️';
+        [data-theme="dark"] .toggle-thumb {
+            transform: translateX(30px);
+            background: #2d3748;
+        }
+
+        .sun-icon, .moon-icon {
+            position: absolute;
+            font-size: 12px;
             transition: all 0.3s ease;
-            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
         }
 
-        /* Dark mode styles for toggle */
-        [data-theme="dark"] .theme-toggle {
-            background: linear-gradient(145deg, #1e293b, #334155);
-            box-shadow: 
-                inset 2px 2px 6px rgba(0, 0, 0, 0.3),
-                inset -2px -2px 6px rgba(255, 255, 255, 0.05),
-                0 4px 12px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .sun-icon {
+            color: #fbbf24;
+            opacity: 1;
         }
 
-        [data-theme="dark"] .theme-toggle:hover {
-            box-shadow: 
-                inset 2px 2px 8px rgba(0, 0, 0, 0.4),
-                inset -2px -2px 8px rgba(255, 255, 255, 0.08),
-                0 8px 20px rgba(0, 0, 0, 0.5);
+        .moon-icon {
+            color: #64748b;
+            opacity: 0;
         }
 
-        [data-theme="dark"] .theme-toggle__slider {
-            left: 35px;
-            background: linear-gradient(145deg, #475569, #64748b);
-            box-shadow: 
-                2px 2px 6px rgba(0, 0, 0, 0.4),
-                -1px -1px 4px rgba(255, 255, 255, 0.08),
-                inset 1px 1px 2px rgba(255, 255, 255, 0.1),
-                inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+        [data-theme="dark"] .sun-icon {
+            opacity: 0;
         }
 
-        [data-theme="dark"] .theme-toggle__slider::before {
-            content: '🌙';
+        [data-theme="dark"] .moon-icon {
+            opacity: 1;
+            color: #60a5fa;
         }
 
-        /* Toggle container for proper positioning */
         .theme-toggle-container {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 4px 8px;
-            border-radius: 8px;
+            position: relative;
+            display: inline-block;
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+            border-radius: 50px;
+            padding: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .theme-toggle-container:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         [data-theme="dark"] .theme-toggle-container {
             background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         [data-theme="dark"] .theme-toggle-container:hover {
             background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.05);
         }
     </style>
 </head>
@@ -599,8 +581,13 @@
                     <div class="theme-toggle-container">
                         <button onclick="toggleTheme()" 
                                 class="theme-toggle"
-                                title="Toggle Dark/Light Mode">
-                            <div class="theme-toggle__slider"></div>
+                                title="Karanlık/Aydınlık Mod">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb">
+                                    <i class="fas fa-sun sun-icon"></i>
+                                    <i class="fas fa-moon moon-icon"></i>
+                                </div>
+                            </div>
                         </button>
                     </div>
                     
@@ -1565,11 +1552,29 @@
 
         // Theme toggle functionality
         function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
+            
+            // Add smooth transition
+            document.body.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            setTimeout(() => {
+                document.body.style.transition = '';
+            }, 400);
+            
+            // Add ripple effect to toggle
+            const toggle = document.querySelector('.theme-toggle');
+            if (toggle) {
+                const ripple = document.createElement('div');
+                ripple.classList.add('ripple');
+                toggle.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            }
         }
 
         // Initialize theme on page load
