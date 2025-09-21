@@ -10,7 +10,7 @@ import pytest
 import subprocess
 
 app = Flask(__name__)
-app.secret_key = 'benimgizlianahtarim123'  # Flash mesajları için - istediğin herhangi bir text
+app.secret_key = 'cokgizlikey'  # Flash mesajları için - istediğin herhangi bir text
 
 # Basit Flask uygulaması
 
