@@ -8,9 +8,13 @@ from functools import wraps
 import os
 import pytest
 import subprocess
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'cokgizlikey'  # Flash mesajları için - istediğin herhangi bir text
+app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24).hex())
 
 # Basit Flask uygulaması
 

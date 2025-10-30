@@ -18,12 +18,18 @@ Flask tabanlı bir görev yönetimi uygulaması. Kullanıcılar kayıt olup giri
 pip install -r requirements.txt
 ```
 
-2. Uygulamayı başlatın:
+2. `.env` dosyası oluşturun (güvenlik için):
+```bash
+copy .env.example .env
+```
+Ardından `.env` dosyasındaki `SECRET_KEY` değerini değiştirin.
+
+3. Uygulamayı başlatın:
 ```bash
 python api.py
 ```
 
-3. Tarayıcıda açın:
+4. Tarayıcıda açın:
    - Ana sayfa: http://127.0.0.1:5000
    - API: http://127.0.0.1:5000/api
 
