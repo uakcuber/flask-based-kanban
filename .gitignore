@@ -62,6 +62,7 @@ Thumbs.db
 nginx/
 
 # SSL Certificates (security sensitive)
+certs/
 *.pem
 *.key
 *.crt
