@@ -4,10 +4,13 @@ instance/
 *.db-journal
 *.db-wal
 *.db-shm
+*.sqlite
 
 # Python
 __pycache__/
 *.py[cod]
+*.pyc
+*.pyo
 *$py.class
 *.so
 .Python
@@ -34,10 +37,13 @@ MANIFEST
 myvenv/
 venv/
 env/
+ENV/
 .env
 
 # Testing
 .pytest_cache/
+.coverage
+htmlcov/
 
 # IDE
 .vscode/
@@ -54,3 +60,8 @@ Thumbs.db
 
 # Nginx binary (downloaded locally)
 nginx/
+
+# SSL Certificates (security sensitive)
+*.pem
+*.key
+*.crt

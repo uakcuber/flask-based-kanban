@@ -1,21 +1,39 @@
-# Flask Kanban Board API
+# Kanban Pano Uygulaması
 
-A comprehensive Flask-based REST API for user management with modern web interface. This project features HTTPS security, Nginx proxy integration, and an interactive terminal-style homepage. Built as a foundation for a full-featured Kanban board application with robust user authentication.
+Flask tabanlı bir görev yönetimi uygulaması. Kullanıcılar kayıt olup giriş yaparak kendi Kanban panolarını oluşturabilir, görevlerini listeler halinde organize edebilir.
 
+## Özellikler
 
-####. **Run the application**
-   ```bash
-   python api.py
-   ```
+- Kullanıcı kayıt ve giriş sistemi
+- Kişiye özel Kanban panoları
+- Görev kartları (başlık, açıklama, öncelik)
+- Liste bazlı görev organizasyonu
+- REST API desteği
+- SQLite veritabanı
 
-####. **Access the application**
-   - **HTTPS (Recommended)**: https://localhost
-   - **HTTP Fallback**: http://127.0.0.1:5000
-   - **API Base URL**: https://localhost/api
+## Kurulum
 
+1. Gerekli paketleri yükleyin:
+```bash
+pip install -r requirements.txt
+```
 
+2. Uygulamayı başlatın:
+```bash
+python api.py
+```
 
+3. Tarayıcıda açın:
+   - Ana sayfa: http://127.0.0.1:5000
+   - API: http://127.0.0.1:5000/api
 
+## Kullanım
+
+1. Ana sayfadan kayıt ol
+2. Giriş yap
+3. Pano oluştur
+4. Listeler ekle (Yapılacak, Devam Eden, Tamamlandı vb.)
+5. Görev kartları ekleyip yönet
 
 
 
