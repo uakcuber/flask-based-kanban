@@ -58,6 +58,8 @@ Thumbs.db
 # Logs
 *.log
 
+*.vscode
+
 # Nginx binary (downloaded locally)
 nginx/
 
